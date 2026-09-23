@@ -24,3 +24,60 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+.page-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 64px 24px;
+}
+
+.page-header {
+  margin-bottom: 32px;
+}
+
+.page-header h1 {
+  font-size: 36px;
+  margin-bottom: 8px;
+}
+
+.page-header p {
+  color: #666;
+  font-size: 16px;
+}
+
+.caption-grid {
+  display: grid;
+  gap: 20px;
+}
+
+.caption-card {
+  padding: 24px;
+  border: 1px solid #e5e5e5;
+  border-radius: 12px;
+  background: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.caption-number {
+  display: block;
+  margin-bottom: 12px;
+  color: #777;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.caption-text {
+  font-size: 18px;
+  line-height: 1.6;
+}
+
+.message-box {
+  padding: 24px;
+  border: 1px solid #e5e5e5;
+  border-radius: 12px;
+  background: white;
+}
+
+.error-message {
+  border-color: #e5a0a0;
+}
