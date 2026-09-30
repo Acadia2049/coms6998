@@ -12,21 +12,30 @@ export default async function Home() {
 
     const {
         data: { user },
-        error: authError,
     } = await supabase.auth.getUser();
-
-    if (authError) {
-        console.error("Authentication check failed:", authError.message);
-    }
 
     if (!user) {
         return (
-            <main className="page-container">
-                <header className="page-header">
-                    <h1>Funny Captions</h1>
-                    <p>Sign in to view your saved Supabase content.</p>
+            <main className="login-page">
+                <div className="login-glow login-glow-left" />
+                <div className="login-glow login-glow-right" />
+
+                <section className="login-card">
+                    <div className="brand-mark" aria-hidden="true">
+                        &ldquo;
+                    </div>
+                    <p className="eyebrow">Caption Vault</p>
+                    <h1>Your funniest ideas, kept in one place.</h1>
+                    <p className="login-description">
+                        Sign in to open your private caption collection and
+                        pick up exactly where you left off.
+                    </p>
                     <GoogleSignInButton />
-                </header>
+                    <p className="privacy-note">
+                        <span className="privacy-dot" aria-hidden="true" />
+                        Your saved content stays behind your account.
+                    </p>
+                </section>
             </main>
         );
     }
@@ -50,26 +59,43 @@ export default async function Home() {
         .order("id");
 
     return (
-        <main className="page-container">
-            <header className="page-header">
-                <h1>Funny Captions</h1>
-                <p>Browse captions loaded directly from Supabase.</p>
+        <main className="home-page">
+            <nav className="home-nav" aria-label="Main navigation">
+                <Link className="home-brand" href="/">
+                    <span className="home-brand-mark" aria-hidden="true">
+                        &ldquo;
+                    </span>
+                    <span>Caption Vault</span>
+                </Link>
 
-                <div>
-                    <p>Signed in as {user.email}</p>
-
-                    <div className="auth-actions">
-                        <Link className="profile-link-button" href="/profile">
-                            Profile
-                        </Link>
-
-                        <Link className="profile-link-button" href="/dashboard">
-                            Dashboard
-                        </Link>
-
-                        <SignOutButton />
-                    </div>
+                <div className="auth-actions">
+                    <span className="signed-in-email">{user.email}</span>
+                    <Link className="profile-link-button" href="/profile">
+                        Profile
+                    </Link>
+                    <Link className="profile-link-button" href="/dashboard">
+                        Dashboard
+                    </Link>
+                    <SignOutButton />
                 </div>
+            </nav>
+
+            <div className="home-content">
+                <header className="collection-header">
+                    <div>
+                        <p className="eyebrow">Your private collection</p>
+                        <h1>Captions worth keeping.</h1>
+                        <p className="collection-description">
+                            A small archive of ideas saved from Supabase,
+                            available only after you sign in.
+                        </p>
+                    </div>
+
+                    <div className="caption-count" aria-label={`${captions?.length ?? 0} saved captions`}>
+                        <strong>{captions?.length ?? 0}</strong>
+                        <span>saved captions</span>
+                    </div>
+                </header>
 
                 {needsProfileCompletion && (
                     <CompleteProfileForm
@@ -78,29 +104,30 @@ export default async function Home() {
                         initialLastName={profile?.last_name}
                     />
                 )}
-            </header>
 
-            {error ? (
-                <div className="message-box error-message">
-                    <h2>Something went wrong</h2>
-                    <p>{error.message}</p>
-                </div>
-            ) : !captions || captions.length === 0 ? (
-                <div className="message-box">
-                    <h2>No captions yet</h2>
-                    <p>Check back later for new captions.</p>
-                </div>
-            ) : (
-                <div className="caption-grid">
-                    {captions.map((caption) => (
-                        <CaptionCard
-                            key={caption.id}
-                            id={caption.id}
-                            text={caption.text}
-                        />
-                    ))}
-                </div>
-            )}
+                {error ? (
+                    <div className="message-box error-message">
+                        <h2>Something went wrong</h2>
+                        <p>{error.message}</p>
+                    </div>
+                ) : !captions || captions.length === 0 ? (
+                    <div className="message-box empty-message">
+                        <span aria-hidden="true">&ldquo;</span>
+                        <h2>No captions yet</h2>
+                        <p>Your saved captions will appear here.</p>
+                    </div>
+                ) : (
+                    <div className="caption-grid">
+                        {captions.map((caption) => (
+                            <CaptionCard
+                                key={caption.id}
+                                id={caption.id}
+                                text={caption.text}
+                            />
+                        ))}
+                    </div>
+                )}
+            </div>
         </main>
     );
 }
