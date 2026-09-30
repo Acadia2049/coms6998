@@ -25,6 +25,8 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
+/* ---------- Shared page layout ---------- */
+
 .page-container {
   max-width: 900px;
   margin: 0 auto;
@@ -36,14 +38,89 @@ body {
 }
 
 .page-header h1 {
-  font-size: 36px;
   margin-bottom: 8px;
+  font-size: 36px;
 }
 
 .page-header p {
   color: #666;
   font-size: 16px;
 }
+
+/* ---------- Auth buttons ---------- */
+
+.google-sign-in-button {
+  margin-top: 16px;
+  padding: 10px 16px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  background: white;
+  color: #111827;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+          background-color 0.2s ease,
+          border-color 0.2s ease;
+}
+
+.google-sign-in-button:hover {
+  background: #f3f4f6;
+  border-color: #9ca3af;
+}
+
+.google-sign-in-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* Home page signed-in actions */
+
+.auth-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.profile-link-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 18px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  background: white;
+  color: #111827;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.5;
+  text-decoration: none;
+}
+
+.profile-link-button:hover {
+  background: #f3f4f6;
+}
+
+/*
+  Important:
+  Profile, Dashboard, and Sign out use exactly the same
+  alignment rules when they appear inside auth-actions.
+*/
+.auth-actions .profile-link-button,
+.auth-actions .google-sign-in-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  margin: 0;
+  padding: 10px 18px;
+  box-sizing: border-box;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+/* ---------- Captions ---------- */
 
 .caption-grid {
   display: grid;
@@ -55,6 +132,7 @@ body {
   border: 1px solid #e5e5e5;
   border-radius: 12px;
   background: white;
+  color: #171717;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
@@ -71,13 +149,205 @@ body {
   line-height: 1.6;
 }
 
+/* ---------- Generic message boxes ---------- */
+
 .message-box {
   padding: 24px;
   border: 1px solid #e5e5e5;
   border-radius: 12px;
   background: white;
+  color: #171717;
 }
 
 .error-message {
   border-color: #e5a0a0;
+}
+
+/* ---------- Profile completion ---------- */
+
+.profile-form-section {
+  margin-top: 24px;
+  padding: 24px;
+  border: 1px solid #e5e5e5;
+  border-radius: 12px;
+  background: white;
+  color: #171717;
+}
+
+.profile-form-section h2 {
+  margin-bottom: 8px;
+  font-size: 22px;
+}
+
+.profile-form-section > p {
+  color: #666;
+}
+
+/* ---------- Profile form ---------- */
+
+.profile-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 500px;
+  margin: 24px 0;
+}
+
+.profile-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.profile-field label {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.profile-field input,
+.profile-input {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  background: white;
+  color: #111827;
+  font: inherit;
+}
+
+.profile-field input:focus,
+.profile-input:focus {
+  outline: 2px solid #111827;
+  outline-offset: 1px;
+}
+
+.profile-save-button {
+  width: fit-content;
+  padding: 11px 18px;
+  border: none;
+  border-radius: 8px;
+  background: #111827;
+  color: white;
+  font: inherit;
+  cursor: pointer;
+}
+
+.profile-save-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.profile-success {
+  margin: 0;
+  color: #166534;
+}
+
+.profile-error {
+  margin: 0;
+  color: #b91c1c;
+}
+
+.profile-form .google-sign-in-button {
+  align-self: flex-start;
+  margin-top: 0;
+}
+
+/* ---------- Profile photo ---------- */
+
+.profile-photo-section {
+  margin: 28px 0;
+}
+
+.profile-photo-section h2 {
+  margin-bottom: 16px;
+  font-size: 1.2rem;
+}
+
+.profile-avatar {
+  display: block;
+  width: 160px;
+  height: 160px;
+  margin-bottom: 16px;
+  border: 1px solid #e5e7eb;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.profile-photo-empty {
+  margin-bottom: 16px;
+  color: #6b7280;
+}
+
+.profile-photo-button {
+  display: inline-block;
+  padding: 10px 16px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  background: white;
+  color: #111827;
+  cursor: pointer;
+}
+
+.profile-photo-button:hover {
+  background: #f3f4f6;
+}
+
+.profile-photo-input {
+  display: none;
+}
+
+/* ---------- Dashboard ---------- */
+
+.dashboard-card {
+  width: 100%;
+  max-width: 620px;
+  margin: 48px 0;
+  padding: 36px;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  background: white;
+  box-sizing: border-box;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.06);
+}
+
+.dashboard-welcome {
+  margin-top: 12px;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.dashboard-description {
+  margin-bottom: 24px;
+  color: #6b7280;
+}
+
+.dashboard-avatar {
+  display: block;
+  width: 120px;
+  height: 120px;
+  margin-bottom: 24px;
+  border: 1px solid #e5e7eb;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.dashboard-links {
+  display: flex;
+  gap: 18px;
+  margin: 20px 0;
+}
+
+.dashboard-links a {
+  color: #374151;
+  text-decoration: none;
+}
+
+.dashboard-links a:hover {
+  text-decoration: underline;
+}
+
+.dashboard-signin-title {
+  margin-top: 24px;
+  margin-bottom: 8px;
+  font-size: 1.2rem;
 }
