@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
@@ -13,8 +13,13 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Caption Vault",
-  description: "A private collection of saved captions.",
+  title: "NYC After Dark",
+  description: "Every night, NYC gives you a new creative assignment.",
+};
+
+export const viewport: Viewport = {
+  themeColor: "#111116",
+  colorScheme: "dark",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

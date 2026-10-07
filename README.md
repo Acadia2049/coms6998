@@ -1,36 +1,63 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# NYC After Dark
 
-## Getting Started
+Every night, NYC gives you an assignment.
 
-First, run the development server:
+NYC After Dark is a daily AI-assisted creative challenge for Columbia students
+and other chronically online New Yorkers. Signed-in users can generate a
+response, edit and publish it, browse the public wall, and leave one FIRE vote
+on each response.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## Stack
+
+- Next.js App Router and React
+- Supabase Auth, Postgres, Row Level Security, and Storage
+- Google Gemini via the server-only `@google/genai` SDK
+- Vercel deployment
+
+## Local setup
+
+Copy `.env.example` to `.env.local` and provide:
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=...
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=...
+GEMINI_API_KEY=...
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+`GEMINI_API_KEY` must remain server-only. Never prefix it with `NEXT_PUBLIC_`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Install dependencies and run the app:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm install
+npm run dev
+```
 
-## Learn More
+Open <http://localhost:3000>.
 
-To learn more about Next.js, take a look at the following resources:
+## Database
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+The Week 4 schema and RLS policies live in:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```text
+supabase/migrations/20261007_week4_nyc_after_dark.sql
+```
 
-## Deploy on Vercel
+The migration:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- extends `captions` with prompt, owner, challenge, publish, and score fields;
+- creates one-vote-per-user `votes` rows;
+- keeps drafts private and published captions public;
+- prevents clients from forging another user's `user_id`;
+- exposes vote totals without exposing voter identities.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Verification
+
+```bash
+npm run lint
+npx next build --webpack
+```
+
+Before submitting, verify in an incognito window that public content is visible,
+mutations require login, drafts stay private, and Vercel Deployment Protection
+is disabled.
