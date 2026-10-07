@@ -7,7 +7,7 @@ import { createClient } from "@/lib/supabase/server";
 const MAX_ANGLE_LENGTH = 280;
 const MAX_RESPONSE_LENGTH = 600;
 const GEMINI_MODEL = "gemini-3.5-flash-lite";
-const GEMINI_TIMEOUT_MS = 10_000;
+const GEMINI_TIMEOUT_MS = 8_500;
 
 async function generateWithGemini(ai: GoogleGenAI, prompt: string) {
     const startedAt = Date.now();
@@ -24,7 +24,7 @@ async function generateWithGemini(ai: GoogleGenAI, prompt: string) {
                 httpOptions: {
                     timeout: GEMINI_TIMEOUT_MS,
                     retryOptions: {
-                        attempts: 2,
+                        attempts: 1,
                         initialDelay: 0.5,
                         maxDelay: 0.5,
                     },
