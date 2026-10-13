@@ -1,8 +1,7 @@
-import Link from "next/link";
-
 import CaptionCard from "@/app/components/CaptionCard";
 import GoogleSignInButton from "@/app/components/GoogleSignInButton";
-import SignOutButton from "@/app/components/SignOutButton";
+import SiteFooter from "@/app/components/SiteFooter";
+import SiteHeader from "@/app/components/SiteHeader";
 import SubmissionComposer from "@/app/components/SubmissionComposer";
 import { extractSeedFromGenerationPrompt, getTonightChallenge } from "@/lib/challenges";
 import { createClient } from "@/lib/supabase/server";
@@ -29,7 +28,7 @@ export default async function Home() {
         .eq("challenge_text", challenge.id)
         .not("published_at", "is", null)
         .order("vote_score", { ascending: false })
-        .order("published_at", { ascending: false });
+        .order("published_at", { ascending: true });
 
     let initialDraft: Draft | null = null;
     const votedCaptionIds = new Set<number>();
@@ -60,103 +59,96 @@ export default async function Home() {
     }
 
     const formattedDate = new Intl.DateTimeFormat("en-US", {
+        weekday: "short",
         month: "short",
         day: "numeric",
         timeZone: "America/New_York",
     }).format(new Date(`${challenge.date}T12:00:00-04:00`));
 
     return (
-        <main className="night-page">
-            <div className="print-noise" aria-hidden="true" />
+        <div className="notice-site">
+            <div className="wall-grain" aria-hidden="true" />
+            <SiteHeader isAuthenticated={Boolean(user)} />
 
-            <nav className="night-nav" aria-label="Main navigation">
-                <Link className="night-brand" href="/">
-                    <span className="brand-city">NYC</span>
-                    <span>AFTER DARK</span>
-                </Link>
+            <main>
+                <section className="hero-shell" aria-labelledby="hero-title">
+                    <div className="hero-copy">
+                        <p className="hero-eyebrow">A NEW YORK STORY, WRITTEN NIGHTLY</p>
+                        <h1 id="hero-title">After midnight, every place has rules.</h1>
+                        <p className="hero-intro">
+                            Write one rule. AI makes it unsettling. The city decides if it becomes canon.
+                        </p>
 
-                <div className="night-auth-actions">
-                    {user ? (
-                        <>
-                            <span className="night-email">{user.email}</span>
-                            <Link className="night-text-link" href="/profile">
-                                Profile
-                            </Link>
-                            <SignOutButton />
-                        </>
-                    ) : (
-                        <GoogleSignInButton />
-                    )}
-                </div>
-            </nav>
+                        <article className="scene-notice" aria-labelledby="scene-location">
+                            <div className="scene-notice-topline">
+                                <span>TONIGHT&apos;S WALL</span>
+                                <span>{formattedDate.toUpperCase()}</span>
+                            </div>
+                            <div className="scene-location-row">
+                                <div>
+                                    <span className="scene-label">LOCATION</span>
+                                    <h2 id="scene-location">{challenge.location}</h2>
+                                </div>
+                                <time>{challenge.time}</time>
+                            </div>
+                            <p className="scene-incident">{challenge.incident}</p>
+                            <p className="scene-question">{challenge.prompt}</p>
+                            <div className="fiction-stamp">FICTIONAL NIGHT NOTICE</div>
+                        </article>
 
-            <section className="challenge-section">
-                <div className="challenge-meta">
-                    <span>01 / TONIGHT&apos;S LOCATION</span>
-                    <span>{formattedDate} · NEW YORK CITY</span>
-                </div>
-                <div className="challenge-stage">
-                    <div className="challenge-poster">
-                        <span className="challenge-kicker">
-                            {challenge.location} · {challenge.time}
-                        </span>
-                        <h1>{challenge.incident}</h1>
-                        <p className="challenge-description">{challenge.prompt}</p>
-                        <div className="challenge-poster-footer" aria-hidden="true">
-                            <span>FICTIONAL NOTICE</span>
-                            <span>TONIGHT ONLY</span>
-                        </div>
+                        <ol className="hero-flow" aria-label="How NYC After Dark works">
+                            <li><span>01</span> Write a rule</li>
+                            <li><span>02</span> AI makes it unsettling</li>
+                            <li><span>03</span> Publish</li>
+                            <li><span>04</span> Vote</li>
+                        </ol>
                     </div>
-                </div>
-            </section>
 
-            <nav className="challenge-flow" aria-label="How it works">
-                <ol>
-                    <li><span>01</span> Write one rule</li>
-                    <li><span>02</span> AI makes it unsettling</li>
-                    <li><span>03</span> Publish</li>
-                    <li><span>04</span> Vote</li>
-                </ol>
-            </nav>
+                    <aside className="hero-action" aria-label="Create tonight's rule">
+                        {user ? (
+                            <SubmissionComposer initialDraft={initialDraft} />
+                        ) : (
+                            <section className="signin-callout">
+                                <span className="notice-kicker">ADD A RULE</span>
+                                <h2>What must people do to survive tonight?</h2>
+                                <p>
+                                    Sign in to write a seed. AI will turn it into a private,
+                                    editable night notice before anything is published.
+                                </p>
+                                <GoogleSignInButton />
+                                <small>Browsing the wall does not require an account.</small>
+                            </section>
+                        )}
+                    </aside>
+                </section>
 
-            <div className="night-content">
-                {user ? (
-                    <SubmissionComposer initialDraft={initialDraft} />
-                ) : (
-                    <section className="signin-callout">
-                        <span className="step-stamp">02 / ADD A RULE</span>
+                <section className="tonight-wall" id="tonights-wall" aria-labelledby="wall-title">
+                    <header className="section-heading">
                         <div>
-                            <h2>Write one rule.</h2>
-                            <p>Sign in, give the AI one rule idea, edit the saved draft, and post it to tonight&apos;s wall.</p>
+                            <span className="section-index">02 / PUBLIC NOTICE BOARD</span>
+                            <h2 id="wall-title">Tonight&apos;s Wall</h2>
+                            <p>Voting stays open until the next NYC night begins.</p>
                         </div>
-                        <GoogleSignInButton />
-                    </section>
-                )}
-
-                <section className="wall-section" aria-labelledby="wall-title">
-                    <header className="wall-heading">
-                        <div>
-                            <span className="step-stamp">03 / TONIGHT&apos;S WALL</span>
-                            <h2 id="wall-title">Tonight&apos;s rules</h2>
-                        </div>
-                        <div className="wall-count">
-                            <strong>{captions?.length ?? 0}</strong>
-                            <span>rules posted</span>
+                        <div className="wall-count" aria-label={`${captions?.length ?? 0} rules posted`}>
+                            <strong>{String(captions?.length ?? 0).padStart(2, "0")}</strong>
+                            <span>RULES<br />POSTED</span>
                         </div>
                     </header>
 
                     {captionsError ? (
-                        <div className="night-message error-message">
+                        <div className="wall-state wall-error">
                             The wall is temporarily covered. Try refreshing.
                         </div>
                     ) : !captions?.length ? (
-                        <div className="empty-wall">
-                            <span aria-hidden="true">✦</span>
-                            <h3>No notices have been posted.</h3>
-                            <p>Be the first person to write tonight&apos;s survival rule.</p>
+                        <div className="wall-state wall-empty">
+                            <span className="empty-symbol" aria-hidden="true">!</span>
+                            <div>
+                                <h3>No notices have been posted.</h3>
+                                <p>Tonight&apos;s first rule could become the first entry in the archive.</p>
+                            </div>
                         </div>
                     ) : (
-                        <div className="poster-wall">
+                        <div className="rule-grid">
                             {captions.map((caption, index) => (
                                 <CaptionCard
                                     key={caption.id}
@@ -172,12 +164,33 @@ export default async function Home() {
                         </div>
                     )}
                 </section>
-            </div>
 
-            <footer className="night-footer">
-                <span>Fictional notices · AI generated from human seeds.</span>
-                <span>A new location appears tomorrow.</span>
-            </footer>
-        </main>
+                <section className="how-section" id="how-it-works" aria-labelledby="how-title">
+                    <header>
+                        <span className="section-index">03 / HOW IT WORKS</span>
+                        <h2 id="how-title">One human idea. One unsettling notice.</h2>
+                    </header>
+                    <div className="how-grid">
+                        <article>
+                            <span>01</span>
+                            <h3>Write the seed</h3>
+                            <p>Give the night one clear rule idea in 10–180 characters.</p>
+                        </article>
+                        <article>
+                            <span>02</span>
+                            <h3>Shape the notice</h3>
+                            <p>AI expands it into a fictional 40–90 word survival notice. You can edit it.</p>
+                        </article>
+                        <article>
+                            <span>03</span>
+                            <h3>Make it canon</h3>
+                            <p>The three highest-ranked rules enter Past Nights. Number one becomes the primary rule.</p>
+                        </article>
+                    </div>
+                </section>
+            </main>
+
+            <SiteFooter />
+        </div>
     );
 }

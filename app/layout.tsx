@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import "./night.css";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -14,11 +15,11 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "NYC After Dark",
-  description: "Every night, NYC gives you a new creative assignment.",
+    description: "Write one rule. AI makes it unsettling. The city decides if it becomes canon.",
 };
 
 export const viewport: Viewport = {
-  themeColor: "#111116",
+    themeColor: "#121313",
   colorScheme: "dark",
 };
 

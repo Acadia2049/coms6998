@@ -19,18 +19,23 @@ export default function CaptionCard({
     index,
     isTop,
 }: CaptionCardProps) {
-    const medium = text.length <= 86 ? "sticker" : text.length <= 180 ? "stencil" : "wheatpaste";
+    const rank = index + 1;
 
     return (
         <article
-            className={`caption-card medium-${medium} wall-position-${(index % 6) + 1}`}
+            className={`rule-notice notice-variant-${(index % 3) + 1}`}
             data-caption-id={id}
         >
-            <div className="poster-tape" aria-hidden="true" />
-            {isTop && <span className="top-sticker">TONIGHT&apos;S HOTTEST</span>}
-            <span className="caption-number">DROP #{String(id).padStart(3, "0")}</span>
-            <p className="caption-text">{text}</p>
-            <footer className="caption-footer">
+            <div className="notice-fastener" aria-hidden="true" />
+            <header className="rule-notice-header">
+                <span>FICTIONAL NIGHT NOTICE</span>
+                <span>RANK {String(rank).padStart(2, "0")}</span>
+            </header>
+            {isTop && <span className="leading-rule">LEADING RULE</span>}
+            <span className="rule-number">RULE #{String(id).padStart(3, "0")}</span>
+            <p className="rule-copy">{text}</p>
+            <p className="ai-disclosure">AI GENERATED FROM A HUMAN SEED</p>
+            <footer className="rule-notice-footer">
                 {canVote ? (
                     <VoteButton
                         captionId={id}
@@ -38,7 +43,7 @@ export default function CaptionCard({
                         initiallyVoted={hasVoted}
                     />
                 ) : (
-                    <span className="vote-login-note">Sign in to vote · 🔥 {voteScore}</span>
+                    <span className="vote-login-note">Sign in to vote · {voteScore} canon votes</span>
                 )}
             </footer>
         </article>

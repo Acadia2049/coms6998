@@ -60,13 +60,13 @@ export default function VoteButton({
                 type="button"
                 disabled={hasVoted || isVoting}
                 onClick={vote}
-                aria-label={hasVoted ? `Voted. ${score} fire votes` : `Give a fire vote. ${score} votes`}
+                aria-label={hasVoted ? `Canon vote cast. ${score} votes` : `Make canon. ${score} votes`}
             >
-                <span aria-hidden="true">{hasVoted ? "✓" : "🔥"}</span>
-                <span>{hasVoted ? "Stamped" : "Fire"}</span>
+                <span aria-hidden="true">{hasVoted ? "✓" : "+"}</span>
+                <span>{hasVoted ? "Canon vote cast" : "Make canon"}</span>
                 <strong>{score}</strong>
             </button>
-            {justStamped && <span className="fire-stamp" aria-hidden="true">FIRE</span>}
+            {justStamped && <span className="canon-stamp" aria-hidden="true">COUNTED</span>}
             {errorMessage && <span className="vote-error">{errorMessage}</span>}
         </div>
     );

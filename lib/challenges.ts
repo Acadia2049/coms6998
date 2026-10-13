@@ -156,8 +156,7 @@ function getNewYorkDateParts(date: Date) {
     };
 }
 
-export function getTonightChallenge(now = new Date()): DailyChallenge {
-    const { year, month, day } = getNewYorkDateParts(now);
+function getChallengeForDateParts(year: number, month: number, day: number): DailyChallenge {
     const dayNumber = Math.floor(Date.UTC(year, month - 1, day) / DAY_IN_MS);
     const daysSinceAnchor = dayNumber - ROTATION_ANCHOR_DAY_NUMBER;
     const sceneIndex =
@@ -172,6 +171,25 @@ export function getTonightChallenge(now = new Date()): DailyChallenge {
         text: `${scene.incident} ${scene.prompt}`,
         description: `${scene.location} · ${scene.time}`,
     };
+}
+
+export function getTonightChallenge(now = new Date()): DailyChallenge {
+    const { year, month, day } = getNewYorkDateParts(now);
+    return getChallengeForDateParts(year, month, day);
+}
+
+export function getRecentPastChallenges(count: number, now = new Date()) {
+    const { year, month, day } = getNewYorkDateParts(now);
+    const todayDayNumber = Math.floor(Date.UTC(year, month - 1, day) / DAY_IN_MS);
+
+    return Array.from({ length: Math.max(0, count) }, (_, index) => {
+        const pastDate = new Date((todayDayNumber - index - 1) * DAY_IN_MS);
+        return getChallengeForDateParts(
+            pastDate.getUTCFullYear(),
+            pastDate.getUTCMonth() + 1,
+            pastDate.getUTCDate()
+        );
+    });
 }
 
 export function getNightSceneById(id: string) {

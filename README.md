@@ -1,11 +1,11 @@
 # NYC After Dark
 
-Every night, NYC gives you an assignment.
+After midnight, every place has rules.
 
-NYC After Dark is a daily AI-assisted creative challenge for Columbia students
-and other chronically online New Yorkers. Signed-in users can generate a
-response, edit and publish it, browse the public wall, and leave one FIRE vote
-on each response.
+NYC After Dark is a daily fictional survival-rule wall. Signed-in users write a
+short human seed, use Gemini to expand it into an editable night notice, publish
+it, and cast one `MAKE CANON` vote per rule. Each completed night's top three
+rules appear in the seven-night archive.
 
 ## Stack
 
@@ -50,6 +50,10 @@ The migration:
 - keeps drafts private and published captions public;
 - prevents clients from forging another user's `user_id`;
 - exposes vote totals without exposing voter identities.
+
+The application stores a stable nightly scene ID in `challenge_text`. This
+keeps legacy challenge content in the database without mixing it into the new
+wall or Past Nights archive.
 
 ## Verification
 
