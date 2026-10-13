@@ -1,14 +1,20 @@
 import { GoogleGenAI, ThinkingLevel } from "@google/genai";
 import { NextResponse } from "next/server";
 
-import { buildGenerationPrompt, getTonightChallenge } from "@/lib/challenges";
+import {
+    buildGenerationPrompt,
+    extractSeedFromGenerationPrompt,
+    getTonightChallenge,
+    RULE_GENERATION_SYSTEM_INSTRUCTION,
+} from "@/lib/challenges";
 import { createClient } from "@/lib/supabase/server";
 
 const MIN_SEED_LENGTH = 10;
 const MAX_SEED_LENGTH = 180;
-const MIN_RESPONSE_WORDS = 40;
-const MAX_RESPONSE_WORDS = 90;
+const MIN_RESPONSE_WORDS = 15;
+const MAX_RESPONSE_WORDS = 45;
 const MAX_RESPONSE_LENGTH = 900;
+const MAX_OUTPUT_TOKENS = 180;
 const GEMINI_MODEL = "gemini-3.5-flash-lite";
 const GEMINI_TIMEOUT_MS = 10_000;
 
@@ -20,7 +26,8 @@ async function generateWithGemini(ai: GoogleGenAI, prompt: string) {
             model: GEMINI_MODEL,
             contents: prompt,
             config: {
-                maxOutputTokens: 180,
+                systemInstruction: RULE_GENERATION_SYSTEM_INSTRUCTION,
+                maxOutputTokens: MAX_OUTPUT_TOKENS,
                 thinkingConfig: {
                     thinkingLevel: ThinkingLevel.MINIMAL,
                 },
@@ -51,6 +58,28 @@ async function generateWithGemini(ai: GoogleGenAI, prompt: string) {
 
 function countEnglishWords(text: string) {
     return text.match(/[A-Za-z]+(?:['’][A-Za-z]+)*/g)?.length ?? 0;
+}
+
+function buildFormatRepairPrompt(
+    originalPrompt: string,
+    previousDraft: string,
+    previousWordCount: number
+) {
+    return [
+        originalPrompt,
+        "",
+        "<REVISION_REQUEST>",
+        `The previous attempt contained ${previousWordCount} English words and missed the required length.`,
+        "Rewrite it as one complete 20-to-35-word rule.",
+        "Preserve the human seed's subject exactly; expand only with one scene-specific condition or one unexplained follow-up.",
+        "Do not introduce a different survival action.",
+        `PREVIOUS_DRAFT_JSON: ${JSON.stringify(previousDraft)}`,
+        "</REVISION_REQUEST>",
+    ].join("\n");
+}
+
+function isPreferredLength(wordCount: number) {
+    return wordCount >= MIN_RESPONSE_WORDS && wordCount <= MAX_RESPONSE_WORDS;
 }
 
 export async function POST(request: Request) {
@@ -122,7 +151,11 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: "Could not load this draft." }, { status: 500 });
         }
 
-        if (!existingDraft || existingDraft.prompt !== prompt) {
+        const existingSeed = existingDraft
+            ? extractSeedFromGenerationPrompt(existingDraft.prompt ?? "")
+            : "";
+
+        if (!existingDraft || existingSeed !== seed) {
             return NextResponse.json(
                 { error: "This draft cannot be regenerated from that rule seed." },
                 { status: 409 }
@@ -132,23 +165,45 @@ export async function POST(request: Request) {
 
     try {
         const ai = new GoogleGenAI({ apiKey });
-        const generatedText = await generateWithGemini(ai, prompt);
-        const responseWordCount = countEnglishWords(generatedText);
+        const firstDraft = await generateWithGemini(ai, prompt);
+        const firstWordCount = countEnglishWords(firstDraft);
+        const candidates = [{ text: firstDraft, wordCount: firstWordCount }];
 
         if (
-            !generatedText ||
-            generatedText.length > MAX_RESPONSE_LENGTH ||
-            responseWordCount < MIN_RESPONSE_WORDS ||
-            responseWordCount > MAX_RESPONSE_WORDS
+            firstDraft.length > MAX_RESPONSE_LENGTH ||
+            !isPreferredLength(firstWordCount)
         ) {
             console.warn(
-                `Gemini returned an invalid notice (${generatedText.length} characters, ${responseWordCount} words).`
+                `Gemini returned a ${firstWordCount}-word notice; requesting one automatic format repair.`
+            );
+
+            const repairedDraft = await generateWithGemini(
+                ai,
+                buildFormatRepairPrompt(prompt, firstDraft, firstWordCount)
+            );
+            candidates.push({
+                text: repairedDraft,
+                wordCount: countEnglishWords(repairedDraft),
+            });
+        }
+
+        const preferredCandidate = candidates.find(
+            ({ text, wordCount }) =>
+                text.length <= MAX_RESPONSE_LENGTH && isPreferredLength(wordCount)
+        );
+
+        if (!preferredCandidate) {
+            const lastCandidate = candidates.at(-1);
+            console.warn(
+                `Gemini returned an unusable notice (${lastCandidate?.text.length ?? 0} characters, ${lastCandidate?.wordCount ?? 0} words).`
             );
             return NextResponse.json(
                 { error: "The AI notice missed the required format. Please try again." },
                 { status: 502 }
             );
         }
+
+        const generatedText = preferredCandidate.text;
 
         const draftMutation = draftId === null
             ? supabase

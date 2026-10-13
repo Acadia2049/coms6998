@@ -7,6 +7,10 @@ short human seed, use Gemini to expand it into an editable night notice, publish
 it, and cast one `MAKE CANON` vote per rule. Each completed night's top three
 rules appear in the seven-night archive.
 
+The current generator uses `gemini-3.5-flash-lite` with minimal thinking. It
+targets a concise 20–35 word rule, preserves the user's central action or
+restriction, and lets an unpublished draft be regenerated in place.
+
 ## Stack
 
 - Next.js App Router and React
@@ -41,6 +45,7 @@ The Week 4 schema and RLS policies live in:
 
 ```text
 supabase/migrations/20261007_week4_nyc_after_dark.sql
+supabase/migrations/20261013_allow_draft_regeneration.sql
 ```
 
 The migration:
@@ -50,6 +55,10 @@ The migration:
 - keeps drafts private and published captions public;
 - prevents clients from forging another user's `user_id`;
 - exposes vote totals without exposing voter identities.
+
+The draft-regeneration policy allows an authenticated author to replace only
+their own unpublished, zero-vote draft. Published rules remain immutable
+through the generation endpoint.
 
 The application stores a stable nightly scene ID in `challenge_text`. This
 keeps legacy challenge content in the database without mixing it into the new
