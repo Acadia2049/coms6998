@@ -2,78 +2,32 @@
 
 After midnight, every place has rules.
 
-NYC After Dark is a daily fictional survival-rule wall. Signed-in users write a
-short human seed, use OpenAI to expand it into an editable night notice, publish
-it, and cast one `MAKE CANON` vote per rule. Each completed night's top three
-rules appear in the seven-night archive.
+NYC After Dark is a daily fictional survival-rule wall. A signed-in visitor
+writes a short human seed, OpenAI shapes it into an editable night notice, and
+the community votes on which rules become canon.
 
-The current generator uses `gpt-6-luna` with reasoning disabled and Fast
-processing. It targets a concise 15–40 word rule, preserves the user's central
-action or restriction, and lets an unpublished draft be regenerated in place.
+## Current release
+
+- Product snapshot: `2026.10.13.1`
+- Model: `gpt-6-luna`
+- Production: <https://coms6998-coms-6998.vercel.app/>
+- Source baseline: `3b49b545291c6fd008c36d1c30ebb6b8ae3a7795`
+
+## Documentation
+
+- [Usage, setup, deployment, and troubleshooting](docs/USAGE.md)
+- [Version archive](docs/versions/README.md)
+- [Current UI and AI snapshot](docs/versions/2026-10-13-openai-luna/README.md)
+- [Current rule-generation prompt](docs/versions/2026-10-13-openai-luna/prompts/rule-generation.md)
+- [Local handoff](NYC_AFTER_DARK_HANDOFF.md)
 
 ## Stack
 
 - Next.js App Router and React
 - Supabase Auth, Postgres, Row Level Security, and Storage
 - OpenAI Responses API
-- Vercel deployment
+- Vercel
 
-## Local setup
-
-Copy `.env.example` to `.env.local` and provide:
-
-```env
-NEXT_PUBLIC_SUPABASE_URL=...
-NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=...
-OPENAI_API_KEY=...
-OPENAI_SERVICE_TIER=fast
-```
-
-`OPENAI_API_KEY` must remain server-only. Never prefix it with `NEXT_PUBLIC_`.
-Set `OPENAI_SERVICE_TIER=default` if Fast processing is unavailable for the
-OpenAI project.
-
-Install dependencies and run the app:
-
-```bash
-npm install
-npm run dev
-```
-
-Open <http://localhost:3000>.
-
-## Database
-
-The Week 4 schema and RLS policies live in:
-
-```text
-supabase/migrations/20261007_week4_nyc_after_dark.sql
-supabase/migrations/20261013_allow_draft_regeneration.sql
-```
-
-The migration:
-
-- extends `captions` with prompt, owner, challenge, publish, and score fields;
-- creates one-vote-per-user `votes` rows;
-- keeps drafts private and published captions public;
-- prevents clients from forging another user's `user_id`;
-- exposes vote totals without exposing voter identities.
-
-The draft-regeneration policy allows an authenticated author to replace only
-their own unpublished, zero-vote draft. Published rules remain immutable
-through the generation endpoint.
-
-The application stores a stable nightly scene ID in `challenge_text`. This
-keeps legacy challenge content in the database without mixing it into the new
-wall or Past Nights archive.
-
-## Verification
-
-```bash
-npm run lint
-npx next build --webpack
-```
-
-Before submitting, verify in an incognito window that public content is visible,
-mutations require login, drafts stay private, and Vercel Deployment Protection
-is disabled.
+The README is intentionally short. Operational instructions live in
+`docs/USAGE.md`; immutable UI, model, prompt, feature, and verification records
+live under `docs/versions/`.

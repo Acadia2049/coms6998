@@ -1,0 +1,74 @@
+{
+  "schemaVersion": 1,
+  "snapshotVersion": "2026.10.13.1",
+  "snapshotId": "2026-10-13-openai-luna",
+  "capturedAt": "2026-10-13T11:32:44-04:00",
+  "timezone": "America/New_York",
+  "source": {
+    "branch": "main",
+    "commit": "3b49b545291c6fd008c36d1c30ebb6b8ae3a7795",
+    "archiveTag": "snapshot-2026-10-13-openai-luna",
+    "packageVersion": "0.1.0"
+  },
+  "deployment": {
+    "provider": "Vercel",
+    "stableUrl": "https://coms6998-coms-6998.vercel.app/",
+    "deploymentUrl": "https://coms6998-m0xbxaljl-coms-6998.vercel.app/",
+    "githubDeploymentId": 7041366446,
+    "status": "success"
+  },
+  "features": [
+    "Fourteen rotating NYC night scenes",
+    "Public Tonight's Wall",
+    "Google authentication through Supabase",
+    "Private AI-generated editable drafts",
+    "In-place draft regeneration",
+    "Publishing to the public wall",
+    "One Make Canon vote per user and rule",
+    "Read-only seven-night top-three archive",
+    "Stable scene IDs and Row Level Security"
+  ],
+  "ai": {
+    "provider": "OpenAI",
+    "api": "Responses API",
+    "model": "gpt-6-luna",
+    "reasoningEffort": "none",
+    "serviceTier": "fast",
+    "maxOutputTokens": 100,
+    "timeoutMs": 6000,
+    "minimumWords": 15,
+    "maximumWords": 40,
+    "store": false,
+    "automaticRetries": 0,
+    "promptFile": "prompts/rule-generation.md"
+  },
+  "databaseMigrations": [
+    "supabase/migrations/20261007_week4_nyc_after_dark.sql",
+    "supabase/migrations/20261013_allow_draft_regeneration.sql"
+  ],
+  "knownIssues": [
+    "Preview requires separately scoped Supabase environment variables.",
+    "The 390 pixel UI has right-edge overflow in the shipped responsive layout.",
+    "A complete signed-in production generate-to-vote flow is not recorded in this snapshot."
+  ],
+  "ui": [
+    {
+      "file": "ui/homepage-desktop-1440.png",
+      "width": 1440,
+      "height": 3400,
+      "sha256": "e6fbfe8d066b3f14868dd964e2c4704f302c174b74a193a4e37a6074ad8a15c4"
+    },
+    {
+      "file": "ui/homepage-mobile-390.png",
+      "width": 390,
+      "height": 3200,
+      "sha256": "673b27ff1d2663363973092e41eca895926b416d97bd9646beca461f280d92a7"
+    },
+    {
+      "file": "ui/past-nights-desktop-1440.png",
+      "width": 1440,
+      "height": 2600,
+      "sha256": "47bbd595027bbadfb2c41f2bd4f592a44ef77fa8aaab1769ddb26193e87c6348"
+    }
+  ]
+}
