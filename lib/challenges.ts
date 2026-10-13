@@ -1,33 +1,142 @@
-export type DailyChallenge = {
+export type NightScene = {
+    id: string;
+    location: string;
+    time: string;
+    incident: string;
+    prompt: string;
+};
+
+export type DailyChallenge = NightScene & {
     date: string;
+    /**
+     * Compatibility copy for the current homepage and generation flow.
+     * New database writes will use `id` as the stable challenge identifier.
+     */
     text: string;
-    description?: string;
+    description: string;
 };
 
 const NYC_TIME_ZONE = "America/New_York";
 const DAY_IN_MS = 24 * 60 * 60 * 1000;
+const ROTATION_ANCHOR_DAY_NUMBER = Math.floor(Date.UTC(2026, 9, 13) / DAY_IN_MS);
 
-const CHALLENGES = [
-    "Explain the 1 train delay like it's a toxic ex.",
-    "Turn your worst Columbia library experience into a movie tagline.",
-    "Write a breakup text from NYC to New Jersey.",
-    "Pitch a luxury fragrance inspired by a suspicious subway smell.",
-    "Write a missed-connections post for two people fighting over the last bagel.",
-    "Give a Times Square mascot a brutally honest LinkedIn headline.",
-    "Turn a 2 a.m. bodega run into the opening line of an epic novel.",
-    "Write the push notification Central Park would send after dark.",
-    "Describe a Columbia group project as a New York Post headline.",
-    "Create a warning label for moving to NYC with only a tote bag and a dream.",
-    "Write an apology from the MTA that somehow makes everything worse.",
-    "Turn overheard dorm-room drama into a Broadway musical tagline.",
-    "Describe your weekend plans like a wildly overconfident subway ad.",
-    "Write NYC a one-star review.",
+/**
+ * The order is intentional: October 13, 2026 starts at index 0, so the
+ * following night (Wednesday, October 14) is the Butler Library scene.
+ */
+export const NIGHT_SCENES: readonly NightScene[] = [
+    {
+        id: "14th-street-empty-train",
+        location: "14th Street Station",
+        time: "1:13 AM",
+        incident: "The last downtown train has arrived completely empty.",
+        prompt: "What is one rule passengers must follow?",
+    },
+    {
+        id: "butler-library-moving-lights",
+        location: "Butler Library, Columbia University",
+        time: "2:17 AM",
+        incident:
+            "The lights in the closed stacks have begun switching on one aisle at a time, moving toward the reading room.",
+        prompt: "What is one rule students must follow until the pattern stops?",
+    },
+    {
+        id: "staten-island-ferry-upper-deck",
+        location: "Last Staten Island Ferry",
+        time: "2:40 AM",
+        incident:
+            "The ferry has left the terminal, but someone is still waving from the locked upper deck.",
+        prompt: "What is one rule passengers must follow before docking?",
+    },
+    {
+        id: "washington-square-missing-arch",
+        location: "Washington Square Park",
+        time: "12:47 AM",
+        incident:
+            "The arch disappears whenever the fountain goes silent, and the exits no longer lead to the same streets.",
+        prompt: "What is one rule visitors must follow to leave the park?",
+    },
+    {
+        id: "chinatown-laundromat-extra-cycle",
+        location: "Chinatown Laundromat",
+        time: "3:06 AM",
+        incident:
+            "Every dryer has stopped except number eight, which has started counting down from a time no one selected.",
+        prompt: "What is one rule customers must follow before the cycle ends?",
+    },
+    {
+        id: "riverside-park-tunnel-footsteps",
+        location: "Riverside Park Tunnel",
+        time: "1:28 AM",
+        incident:
+            "A second set of footsteps begins each time someone reaches the middle of the tunnel.",
+        prompt: "What is one rule pedestrians must follow until they reach the other side?",
+    },
+    {
+        id: "bodega-aisle-seven",
+        location: "24-Hour Bodega",
+        time: "2:22 AM",
+        incident:
+            "The clerk has locked the door and quietly removed every price tag from aisle seven.",
+        prompt: "What is one rule customers must follow before the door opens again?",
+    },
+    {
+        id: "times-square-dark-screens",
+        location: "Times Square",
+        time: "3:33 AM",
+        incident:
+            "Every screen has gone dark except one, which is showing the crowd from five minutes in the future.",
+        prompt: "What is one rule everyone in the square must follow?",
+    },
+    {
+        id: "roosevelt-island-tram-third-stop",
+        location: "Roosevelt Island Tram",
+        time: "12:58 AM",
+        incident:
+            "The tram has paused above the river and announced a third stop that does not appear on the route map.",
+        prompt: "What is one rule riders must follow before the doors open?",
+    },
+    {
+        id: "sealed-subway-entrance-apartment",
+        location: "Apartment Above a Sealed Subway Entrance",
+        time: "1:44 AM",
+        incident:
+            "A train can be heard stopping beneath the building, followed by footsteps climbing a staircase that was filled with concrete.",
+        prompt: "What is one rule residents must follow until morning?",
+    },
+    {
+        id: "coney-island-last-ride",
+        location: "Coney Island Boardwalk",
+        time: "2:51 AM",
+        incident:
+            "The amusement park is closed, but the oldest ride has started running with one occupied car.",
+        prompt: "What is one rule anyone still on the boardwalk must follow?",
+    },
+    {
+        id: "queens-night-bus-last-stop",
+        location: "Queens-Bound Night Bus",
+        time: "3:17 AM",
+        incident:
+            "The route display has replaced every remaining stop with the same unfamiliar street name.",
+        prompt: "What is one rule passengers must follow before requesting a stop?",
+    },
+    {
+        id: "brooklyn-stairwell-extra-floor",
+        location: "Brooklyn Apartment Stairwell",
+        time: "12:36 AM",
+        incident:
+            "A new floor has appeared between the fourth and fifth landings, and its hallway light is already on.",
+        prompt: "What is one rule tenants must follow when passing it?",
+    },
+    {
+        id: "grand-central-lower-platform",
+        location: "Lower Platform Beneath Grand Central",
+        time: "1:09 AM",
+        incident:
+            "An arrival board is listing a train on a platform that has been closed for decades.",
+        prompt: "What is one rule late-night travelers must follow when it arrives?",
+    },
 ];
-
-const CHALLENGE_DESCRIPTIONS: Record<string, string> = {
-    "Write NYC a one-star review.":
-        "Complain about one thing you love to hate about the city.",
-};
 
 function getNewYorkDateParts(date: Date) {
     const parts = new Intl.DateTimeFormat("en-US", {
@@ -50,16 +159,23 @@ function getNewYorkDateParts(date: Date) {
 export function getTonightChallenge(now = new Date()): DailyChallenge {
     const { year, month, day } = getNewYorkDateParts(now);
     const dayNumber = Math.floor(Date.UTC(year, month - 1, day) / DAY_IN_MS);
-    const challengeIndex = ((dayNumber % CHALLENGES.length) + CHALLENGES.length) % CHALLENGES.length;
+    const daysSinceAnchor = dayNumber - ROTATION_ANCHOR_DAY_NUMBER;
+    const sceneIndex =
+        ((daysSinceAnchor % NIGHT_SCENES.length) + NIGHT_SCENES.length) %
+        NIGHT_SCENES.length;
     const date = `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
-
-    const text = CHALLENGES[challengeIndex];
+    const scene = NIGHT_SCENES[sceneIndex];
 
     return {
+        ...scene,
         date,
-        text,
-        description: CHALLENGE_DESCRIPTIONS[text],
+        text: `${scene.incident} ${scene.prompt}`,
+        description: `${scene.location} · ${scene.time}`,
     };
+}
+
+export function getNightSceneById(id: string) {
+    return NIGHT_SCENES.find((scene) => scene.id === id) ?? null;
 }
 
 export function buildGenerationPrompt(
