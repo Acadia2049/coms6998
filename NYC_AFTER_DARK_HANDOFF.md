@@ -20,7 +20,7 @@ NYC After Dark is a nightly fictional survival-rule wall:
 1. Read tonight's NYC location and incident.
 2. Sign in with Google through Supabase Auth.
 3. Write one 10–180 character rule seed.
-4. Gemini generates a concise 20–35 word fictional notice.
+4. OpenAI generates a concise 15–40 word fictional notice.
 5. The notice is immediately saved as a private draft.
 6. Edit, regenerate in place, or publish it to tonight's wall. Regeneration
    replaces the same unpublished draft; publishing clears the composer.
@@ -46,11 +46,12 @@ stable scene IDs.
   - Body: `{ seed, draftId? }`
   - Requires authentication.
   - Inserts a private draft or regenerates the current private draft.
-  - Uses `gemini-3.5-flash-lite`, `MINIMAL` thinking, and a 180-token output
-    budget.
-  - Keeps invariant style and seed-fidelity rules in `systemInstruction`.
-  - Requests one automatic rewrite only when output falls outside the server's
-    15–45 word acceptance range.
+  - Uses `gpt-6-luna`, no reasoning, Fast processing, a 100-token output budget,
+    and a six-second timeout.
+  - Keeps invariant style and seed-fidelity rules in the Responses API
+    `instructions` field.
+  - Accepts only 15–40 words and does not make a hidden second model call when
+    the format is missed, keeping latency predictable.
 - `PATCH /api/submissions/[id]/publish`
   - Body: `{ text }`
   - Only publishes the current user's draft for tonight's scene.
@@ -63,7 +64,7 @@ stable scene IDs.
 - `lib/challenges.ts`: fourteen structured scenes and New York date rotation
 - `app/page.tsx`: dual-column homepage and current wall query
 - `app/past-nights/page.tsx`: read-only seven-night top-three archive
-- `app/api/generate/route.ts`: Gemini prompt, validation, and draft persistence
+- `app/api/generate/route.ts`: OpenAI prompt, validation, and draft persistence
 - `app/components/SubmissionComposer.tsx`: seed, draft, regenerate, and publish UI
 - `app/components/CaptionCard.tsx`: fictional rule notice card
 - `app/components/VoteButton.tsx`: Make Canon interaction
@@ -80,9 +81,9 @@ Completed after the redesign:
 - HTTP 200 for `/` and `/past-nights`
 - Browser QA at 1440px and 390px with no horizontal overflow
 - Browser console contained no errors
-- Authenticated Gemini generation and in-place draft regeneration succeeded
-- Latest regeneration test: 26 words in 1.976 seconds with no format-repair
-  retry
+- Before the OpenAI migration, authenticated Gemini generation and in-place
+  draft regeneration succeeded in the local test environment.
+- The OpenAI path still needs a live test after `OPENAI_API_KEY` is configured.
 
-The complete Gemini → draft → publish → second-account vote flow still needs a
+The complete OpenAI → draft → publish → second-account vote flow still needs a
 final live production test before submission.

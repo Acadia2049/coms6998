@@ -179,7 +179,7 @@ export default async function Home() {
                         <article>
                             <span>02</span>
                             <h3>Shape the notice</h3>
-                            <p>AI shapes it into a fictional 20–35 word rule. You can edit it.</p>
+                            <p>AI shapes it into a fictional 15–40 word rule. You can edit it.</p>
                         </article>
                         <article>
                             <span>03</span>

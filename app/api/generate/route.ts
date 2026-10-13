@@ -1,4 +1,3 @@
-import { GoogleGenAI, ThinkingLevel } from "@google/genai";
 import { NextResponse } from "next/server";
 
 import {
@@ -12,70 +11,81 @@ import { createClient } from "@/lib/supabase/server";
 const MIN_SEED_LENGTH = 10;
 const MAX_SEED_LENGTH = 180;
 const MIN_RESPONSE_WORDS = 15;
-const MAX_RESPONSE_WORDS = 45;
+const MAX_RESPONSE_WORDS = 40;
 const MAX_RESPONSE_LENGTH = 900;
-const MAX_OUTPUT_TOKENS = 180;
-const GEMINI_MODEL = "gemini-3.5-flash-lite";
-const GEMINI_TIMEOUT_MS = 10_000;
+const MAX_OUTPUT_TOKENS = 100;
+const OPENAI_MODEL = "gpt-6-luna";
+const OPENAI_TIMEOUT_MS = 6_000;
+const OPENAI_SERVICE_TIER = process.env.OPENAI_SERVICE_TIER ?? "fast";
 
-async function generateWithGemini(ai: GoogleGenAI, prompt: string) {
+type OpenAIResponsePayload = {
+    error?: { message?: string };
+    output?: Array<{
+        content?: Array<{
+            type?: string;
+            text?: string;
+        }>;
+    }>;
+};
+
+function extractOpenAIText(payload: OpenAIResponsePayload) {
+    return payload.output
+        ?.flatMap((item) => item.content ?? [])
+        .find((content) => content.type === "output_text")
+        ?.text?.trim();
+}
+
+async function generateWithOpenAI(apiKey: string, prompt: string) {
     const startedAt = Date.now();
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), OPENAI_TIMEOUT_MS);
 
     try {
-        const response = await ai.models.generateContent({
-            model: GEMINI_MODEL,
-            contents: prompt,
-            config: {
-                systemInstruction: RULE_GENERATION_SYSTEM_INSTRUCTION,
-                maxOutputTokens: MAX_OUTPUT_TOKENS,
-                thinkingConfig: {
-                    thinkingLevel: ThinkingLevel.MINIMAL,
-                },
-                httpOptions: {
-                    timeout: GEMINI_TIMEOUT_MS,
-                    retryOptions: {
-                        attempts: 1,
-                        initialDelay: 0.5,
-                        maxDelay: 0.5,
-                    },
-                },
+        const response = await fetch("https://api.openai.com/v1/responses", {
+            method: "POST",
+            headers: {
+                Authorization: `Bearer ${apiKey}`,
+                "Content-Type": "application/json",
             },
+            body: JSON.stringify({
+                model: OPENAI_MODEL,
+                reasoning: { effort: "none" },
+                service_tier: OPENAI_SERVICE_TIER,
+                instructions: RULE_GENERATION_SYSTEM_INSTRUCTION,
+                input: prompt,
+                max_output_tokens: MAX_OUTPUT_TOKENS,
+                store: false,
+            }),
+            signal: controller.signal,
         });
+        const payload = (await response.json()) as OpenAIResponsePayload;
 
-        if (response.text?.trim()) {
-            return response.text.trim();
+        if (!response.ok) {
+            throw new Error(
+                `OpenAI ${response.status}: ${payload.error?.message ?? response.statusText}`
+            );
         }
 
-        throw new Error(`${GEMINI_MODEL} returned an empty response.`);
+        const generatedText = extractOpenAIText(payload);
+
+        if (generatedText) {
+            return generatedText;
+        }
+
+        throw new Error(`${OPENAI_MODEL} returned an empty response.`);
     } catch (error) {
         console.warn(
-            `Gemini model ${GEMINI_MODEL} failed after ${Date.now() - startedAt}ms:`,
+            `OpenAI model ${OPENAI_MODEL} failed after ${Date.now() - startedAt}ms:`,
             error instanceof Error ? error.message : "Unknown error"
         );
         throw error;
+    } finally {
+        clearTimeout(timeout);
     }
 }
 
 function countEnglishWords(text: string) {
     return text.match(/[A-Za-z]+(?:['’][A-Za-z]+)*/g)?.length ?? 0;
-}
-
-function buildFormatRepairPrompt(
-    originalPrompt: string,
-    previousDraft: string,
-    previousWordCount: number
-) {
-    return [
-        originalPrompt,
-        "",
-        "<REVISION_REQUEST>",
-        `The previous attempt contained ${previousWordCount} English words and missed the required length.`,
-        "Rewrite it as one complete 20-to-35-word rule.",
-        "Preserve the human seed's subject exactly; expand only with one scene-specific condition or one unexplained follow-up.",
-        "Do not introduce a different survival action.",
-        `PREVIOUS_DRAFT_JSON: ${JSON.stringify(previousDraft)}`,
-        "</REVISION_REQUEST>",
-    ].join("\n");
 }
 
 function isPreferredLength(wordCount: number) {
@@ -125,10 +135,10 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: "Invalid draft." }, { status: 400 });
     }
 
-    const apiKey = process.env.GEMINI_API_KEY;
+    const apiKey = process.env.OPENAI_API_KEY;
 
     if (!apiKey) {
-        console.error("GEMINI_API_KEY is not configured.");
+        console.error("OPENAI_API_KEY is not configured.");
         return NextResponse.json({ error: "AI generation is not configured." }, { status: 500 });
     }
 
@@ -164,46 +174,21 @@ export async function POST(request: Request) {
     }
 
     try {
-        const ai = new GoogleGenAI({ apiKey });
-        const firstDraft = await generateWithGemini(ai, prompt);
-        const firstWordCount = countEnglishWords(firstDraft);
-        const candidates = [{ text: firstDraft, wordCount: firstWordCount }];
+        const generatedText = await generateWithOpenAI(apiKey, prompt);
+        const responseWordCount = countEnglishWords(generatedText);
 
         if (
-            firstDraft.length > MAX_RESPONSE_LENGTH ||
-            !isPreferredLength(firstWordCount)
+            generatedText.length > MAX_RESPONSE_LENGTH ||
+            !isPreferredLength(responseWordCount)
         ) {
             console.warn(
-                `Gemini returned a ${firstWordCount}-word notice; requesting one automatic format repair.`
-            );
-
-            const repairedDraft = await generateWithGemini(
-                ai,
-                buildFormatRepairPrompt(prompt, firstDraft, firstWordCount)
-            );
-            candidates.push({
-                text: repairedDraft,
-                wordCount: countEnglishWords(repairedDraft),
-            });
-        }
-
-        const preferredCandidate = candidates.find(
-            ({ text, wordCount }) =>
-                text.length <= MAX_RESPONSE_LENGTH && isPreferredLength(wordCount)
-        );
-
-        if (!preferredCandidate) {
-            const lastCandidate = candidates.at(-1);
-            console.warn(
-                `Gemini returned an unusable notice (${lastCandidate?.text.length ?? 0} characters, ${lastCandidate?.wordCount ?? 0} words).`
+                `OpenAI returned an unusable notice (${generatedText.length} characters, ${responseWordCount} words).`
             );
             return NextResponse.json(
                 { error: "The AI notice missed the required format. Please try again." },
                 { status: 502 }
             );
         }
-
-        const generatedText = preferredCandidate.text;
 
         const draftMutation = draftId === null
             ? supabase
@@ -247,8 +232,15 @@ export async function POST(request: Request) {
 
         return NextResponse.json({ submission, seed });
     } catch (error) {
+        if (error instanceof Error && error.name === "AbortError") {
+            return NextResponse.json(
+                { error: "AI generation took too long. Please try again." },
+                { status: 504 }
+            );
+        }
+
         console.error(
-            "Gemini generation failed:",
+            "OpenAI generation failed:",
             error instanceof Error ? error.message : "Unknown error"
         );
         return NextResponse.json(

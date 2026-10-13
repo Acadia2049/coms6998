@@ -3,19 +3,19 @@
 After midnight, every place has rules.
 
 NYC After Dark is a daily fictional survival-rule wall. Signed-in users write a
-short human seed, use Gemini to expand it into an editable night notice, publish
+short human seed, use OpenAI to expand it into an editable night notice, publish
 it, and cast one `MAKE CANON` vote per rule. Each completed night's top three
 rules appear in the seven-night archive.
 
-The current generator uses `gemini-3.5-flash-lite` with minimal thinking. It
-targets a concise 20–35 word rule, preserves the user's central action or
-restriction, and lets an unpublished draft be regenerated in place.
+The current generator uses `gpt-6-luna` with reasoning disabled and Fast
+processing. It targets a concise 15–40 word rule, preserves the user's central
+action or restriction, and lets an unpublished draft be regenerated in place.
 
 ## Stack
 
 - Next.js App Router and React
 - Supabase Auth, Postgres, Row Level Security, and Storage
-- Google Gemini via the server-only `@google/genai` SDK
+- OpenAI Responses API
 - Vercel deployment
 
 ## Local setup
@@ -25,10 +25,13 @@ Copy `.env.example` to `.env.local` and provide:
 ```env
 NEXT_PUBLIC_SUPABASE_URL=...
 NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=...
-GEMINI_API_KEY=...
+OPENAI_API_KEY=...
+OPENAI_SERVICE_TIER=fast
 ```
 
-`GEMINI_API_KEY` must remain server-only. Never prefix it with `NEXT_PUBLIC_`.
+`OPENAI_API_KEY` must remain server-only. Never prefix it with `NEXT_PUBLIC_`.
+Set `OPENAI_SERVICE_TIER=default` if Fast processing is unavailable for the
+OpenAI project.
 
 Install dependencies and run the app:
 

@@ -204,7 +204,7 @@ export default function SubmissionComposer({
                             onChange={(event) => setDraftText(event.target.value)}
                         />
                         <div className="draft-meta">
-                            <span>{draftWordCount} words · 20–35 recommended</span>
+                            <span>{draftWordCount} words · 15–40 recommended</span>
                             <span>{draftText.length} / {MAX_NOTICE_LENGTH} characters</span>
                         </div>
                         <div className="draft-button-row">
