@@ -561,6 +561,52 @@ a { -webkit-tap-highlight-color: transparent; }
   margin-top: 15px;
 }
 
+.composer-input-row > label {
+  color: #4d494d;
+  font-size: 13px;
+  font-weight: 760;
+}
+
+.seed-help {
+  display: grid;
+  gap: 7px;
+  color: #6d686b;
+  font-size: 10px;
+  line-height: 1.4;
+}
+
+.seed-help > span {
+  font-family: var(--font-geist-mono), monospace;
+  font-weight: 760;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.seed-help button {
+  width: fit-content;
+  padding: 0;
+  border: 0;
+  border-bottom: 1px solid rgba(21, 20, 25, 0.35);
+  background: transparent;
+  color: #4f4a4f;
+  cursor: pointer;
+  font-size: 11px;
+  text-align: left;
+}
+
+.seed-help button:hover { border-bottom-color: var(--pink-dark); }
+
+.seed-input-footer,
+.draft-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  color: #746f72;
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 9px;
+  line-height: 1.4;
+}
+
 .composer textarea {
   width: 100%;
   min-height: 68px;
@@ -584,6 +630,7 @@ a { -webkit-tap-highlight-color: transparent; }
 .composer textarea::placeholder { color: #817b79; }
 
 .generate-button,
+.regenerate-button,
 .publish-button {
   position: relative;
   min-height: 44px;
@@ -604,19 +651,27 @@ a { -webkit-tap-highlight-color: transparent; }
 
 .generate-button { justify-self: end; }
 
+.regenerate-button {
+  background: transparent;
+  box-shadow: none;
+}
+
 .generate-button:hover,
+.regenerate-button:hover,
 .publish-button:hover {
   box-shadow: 1px 1px 0 var(--cyan);
   transform: translate(1px, 1px);
 }
 
 .generate-button:active,
+.regenerate-button:active,
 .publish-button:active {
   box-shadow: none;
   transform: translate(2px, 2px);
 }
 
 .generate-button:disabled,
+.regenerate-button:disabled,
 .publish-button:disabled {
   cursor: wait;
   filter: grayscale(0.6);
@@ -679,6 +734,16 @@ a { -webkit-tap-highlight-color: transparent; }
   color: #746f72;
   font-family: var(--font-geist-mono), monospace;
   font-size: 10px;
+}
+
+.draft-meta { margin-top: 10px; }
+
+.draft-button-row {
+  display: flex;
+  align-items: stretch;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 14px;
 }
 
 .composer-error {
@@ -1308,9 +1373,13 @@ a { -webkit-tap-highlight-color: transparent; }
   }
 
   .generate-button,
+  .regenerate-button,
   .publish-button { width: 100%; }
 
-  .draft-actions {
+  .draft-actions,
+  .draft-button-row,
+  .seed-input-footer,
+  .draft-meta {
     align-items: stretch;
     flex-direction: column;
   }

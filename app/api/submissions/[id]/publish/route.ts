@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
 
+import { getTonightChallenge } from "@/lib/challenges";
 import { createClient } from "@/lib/supabase/server";
 
-const MAX_RESPONSE_LENGTH = 600;
+const MAX_RESPONSE_LENGTH = 900;
 
 type RouteContext = {
     params: Promise<{ id: string }>;
@@ -46,6 +47,7 @@ export async function PATCH(request: Request, context: RouteContext) {
         );
     }
 
+    const challenge = getTonightChallenge();
     const { data: submission, error } = await supabase
         .from("captions")
         .update({
@@ -54,6 +56,8 @@ export async function PATCH(request: Request, context: RouteContext) {
         })
         .eq("id", submissionId)
         .eq("user_id", user.id)
+        .eq("challenge_date", challenge.date)
+        .eq("challenge_text", challenge.id)
         .is("published_at", null)
         .select("id, text, published_at")
         .maybeSingle();

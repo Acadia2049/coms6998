@@ -4,7 +4,7 @@ import CaptionCard from "@/app/components/CaptionCard";
 import GoogleSignInButton from "@/app/components/GoogleSignInButton";
 import SignOutButton from "@/app/components/SignOutButton";
 import SubmissionComposer from "@/app/components/SubmissionComposer";
-import { getTonightChallenge } from "@/lib/challenges";
+import { extractSeedFromGenerationPrompt, getTonightChallenge } from "@/lib/challenges";
 import { createClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
@@ -12,6 +12,7 @@ export const dynamic = "force-dynamic";
 type Draft = {
     id: number;
     text: string;
+    seed: string;
 };
 
 export default async function Home() {
@@ -25,6 +26,7 @@ export default async function Home() {
         .from("captions")
         .select("id, text, vote_score, published_at")
         .eq("challenge_date", challenge.date)
+        .eq("challenge_text", challenge.id)
         .not("published_at", "is", null)
         .order("vote_score", { ascending: false })
         .order("published_at", { ascending: false });
@@ -36,9 +38,10 @@ export default async function Home() {
         const [{ data: draft }, { data: votes }] = await Promise.all([
             supabase
                 .from("captions")
-                .select("id, text")
+                .select("id, text, prompt")
                 .eq("user_id", user.id)
                 .eq("challenge_date", challenge.date)
+                .eq("challenge_text", challenge.id)
                 .is("published_at", null)
                 .order("created_at", { ascending: false })
                 .limit(1)
@@ -46,7 +49,13 @@ export default async function Home() {
             supabase.from("votes").select("caption_id").eq("user_id", user.id),
         ]);
 
-        initialDraft = draft;
+        initialDraft = draft
+            ? {
+                id: draft.id,
+                text: draft.text,
+                seed: extractSeedFromGenerationPrompt(draft.prompt ?? ""),
+            }
+            : null;
         votes?.forEach((vote) => votedCaptionIds.add(vote.caption_id));
     }
 
@@ -83,19 +92,19 @@ export default async function Home() {
 
             <section className="challenge-section">
                 <div className="challenge-meta">
-                    <span>01 / TONIGHT&apos;S CHALLENGE</span>
+                    <span>01 / TONIGHT&apos;S LOCATION</span>
                     <span>{formattedDate} · NEW YORK CITY</span>
                 </div>
                 <div className="challenge-stage">
                     <div className="challenge-poster">
-                        <span className="challenge-kicker">A new NYC challenge every night.</span>
-                        <h1>{challenge.text}</h1>
-                        {challenge.description && (
-                            <p className="challenge-description">{challenge.description}</p>
-                        )}
+                        <span className="challenge-kicker">
+                            {challenge.location} · {challenge.time}
+                        </span>
+                        <h1>{challenge.incident}</h1>
+                        <p className="challenge-description">{challenge.prompt}</p>
                         <div className="challenge-poster-footer" aria-hidden="true">
+                            <span>FICTIONAL NOTICE</span>
                             <span>TONIGHT ONLY</span>
-                            <span>NO PERFECT ANSWERS</span>
                         </div>
                     </div>
                 </div>
@@ -103,9 +112,10 @@ export default async function Home() {
 
             <nav className="challenge-flow" aria-label="How it works">
                 <ol>
-                    <li><span>01</span> Take the challenge</li>
-                    <li><span>02</span> Make your drop</li>
-                    <li><span>03</span> Stamp your favorites</li>
+                    <li><span>01</span> Write one rule</li>
+                    <li><span>02</span> AI makes it unsettling</li>
+                    <li><span>03</span> Publish</li>
+                    <li><span>04</span> Vote</li>
                 </ol>
             </nav>
 
@@ -114,10 +124,10 @@ export default async function Home() {
                     <SubmissionComposer initialDraft={initialDraft} />
                 ) : (
                     <section className="signin-callout">
-                        <span className="step-stamp">02 / MAKE YOUR DROP</span>
+                        <span className="step-stamp">02 / ADD A RULE</span>
                         <div>
-                            <h2>Got a response?</h2>
-                            <p>Sign in to generate your nightly drop, edit it, and paste it on the wall.</p>
+                            <h2>Write one rule.</h2>
+                            <p>Sign in, give the AI one rule idea, edit the saved draft, and post it to tonight&apos;s wall.</p>
                         </div>
                         <GoogleSignInButton />
                     </section>
@@ -126,12 +136,12 @@ export default async function Home() {
                 <section className="wall-section" aria-labelledby="wall-title">
                     <header className="wall-heading">
                         <div>
-                            <span className="step-stamp">03 / THE WALL</span>
-                            <h2 id="wall-title">Tonight&apos;s drops</h2>
+                            <span className="step-stamp">03 / TONIGHT&apos;S WALL</span>
+                            <h2 id="wall-title">Tonight&apos;s rules</h2>
                         </div>
                         <div className="wall-count">
                             <strong>{captions?.length ?? 0}</strong>
-                            <span>responses pasted up</span>
+                            <span>rules posted</span>
                         </div>
                     </header>
 
@@ -142,8 +152,8 @@ export default async function Home() {
                     ) : !captions?.length ? (
                         <div className="empty-wall">
                             <span aria-hidden="true">✦</span>
-                            <h3>The wall is fresh.</h3>
-                            <p>Be the first person to leave something worth coming back for.</p>
+                            <h3>No notices have been posted.</h3>
+                            <p>Be the first person to write tonight&apos;s survival rule.</p>
                         </div>
                     ) : (
                         <div className="poster-wall">
@@ -165,8 +175,8 @@ export default async function Home() {
             </div>
 
             <footer className="night-footer">
-                <span>Built after midnight near the 1 train.</span>
-                <span>A new challenge lands tomorrow.</span>
+                <span>Fictional notices · AI generated from human seeds.</span>
+                <span>A new location appears tomorrow.</span>
             </footer>
         </main>
     );
