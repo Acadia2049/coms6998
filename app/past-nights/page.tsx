@@ -36,7 +36,7 @@ export default async function PastNightsPage() {
     return (
         <div className="notice-site archive-site">
             <div className="wall-grain" aria-hidden="true" />
-            <SiteHeader isAuthenticated={Boolean(user)} />
+            <SiteHeader isAuthenticated={Boolean(user)} currentPage="archive" />
 
             <main className="archive-main">
                 <header className="archive-hero">

@@ -1,7 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+
+import { createClient } from "@/lib/supabase/client";
 
 type Draft = {
     id: number;
@@ -11,11 +13,13 @@ type Draft = {
 
 type SubmissionComposerProps = {
     initialDraft?: Draft | null;
+    isAuthenticated: boolean;
 };
 
 const MIN_SEED_LENGTH = 10;
 const MAX_SEED_LENGTH = 180;
 const MAX_NOTICE_LENGTH = 900;
+const SAVED_SEED_KEY = "nyc-after-dark-rule-seed";
 
 const SEED_EXAMPLES = [
     "Do not answer if someone calls your name from an empty room.",
@@ -24,6 +28,7 @@ const SEED_EXAMPLES = [
 
 export default function SubmissionComposer({
     initialDraft = null,
+    isAuthenticated,
 }: SubmissionComposerProps) {
     const router = useRouter();
     const [seed, setSeed] = useState(initialDraft?.seed ?? "");
@@ -35,6 +40,29 @@ export default function SubmissionComposer({
     const [publishedCaptionId, setPublishedCaptionId] = useState<number | null>(null);
     const [isRevealingDraft, setIsRevealingDraft] = useState(false);
     const [isPasting, setIsPasting] = useState(false);
+
+    useEffect(() => {
+        if (initialDraft) {
+            return;
+        }
+
+        const savedSeed = window.sessionStorage.getItem(SAVED_SEED_KEY);
+
+        if (savedSeed) {
+            const frame = window.requestAnimationFrame(() => {
+                setSeed((currentSeed) =>
+                    currentSeed || savedSeed.slice(0, MAX_SEED_LENGTH)
+                );
+            });
+
+            return () => window.cancelAnimationFrame(frame);
+        }
+    }, [initialDraft]);
+
+    function updateSeed(value: string) {
+        setSeed(value);
+        window.sessionStorage.setItem(SAVED_SEED_KEY, value);
+    }
 
     function focusPublishedSubmission(captionId: number, attempt = 0) {
         window.setTimeout(() => {
@@ -61,6 +89,23 @@ export default function SubmissionComposer({
         setPublishedCaptionId(null);
 
         try {
+            if (!isAuthenticated) {
+                window.sessionStorage.setItem(SAVED_SEED_KEY, seed);
+                const supabase = createClient();
+                const { error } = await supabase.auth.signInWithOAuth({
+                    provider: "google",
+                    options: {
+                        redirectTo: `${window.location.origin}/auth/callback`,
+                    },
+                });
+
+                if (error) {
+                    throw new Error("Google sign-in could not be started. Please try again.");
+                }
+
+                return;
+            }
+
             const response = await fetch("/api/generate", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -114,6 +159,7 @@ export default function SubmissionComposer({
             setDraft(null);
             setDraftText("");
             setSeed("");
+            window.sessionStorage.removeItem(SAVED_SEED_KEY);
             router.refresh();
             focusPublishedSubmission(publishedId);
             window.setTimeout(() => setIsPasting(false), 300);
@@ -136,26 +182,45 @@ export default function SubmissionComposer({
             className={`creation-zone${isPasting ? " is-pasting" : ""}`}
             aria-labelledby="composer-title"
         >
+            <ol className="composer-progress" aria-label="Creation progress">
+                <li className={!draft && !publishedCaptionId ? "is-current" : "is-complete"}>
+                    Write
+                </li>
+                <li className={draft ? "is-current" : publishedCaptionId ? "is-complete" : ""}>
+                    Draft
+                </li>
+                <li className={publishedCaptionId ? "is-current" : ""}>Publish</li>
+            </ol>
+
+            {publishedCaptionId && (
+                <div className="publish-confirmation" role="status">
+                    <span className="publish-stamp" aria-hidden="true">POSTED</span>
+                    <div>
+                        <strong>Notice #{String(publishedCaptionId).padStart(3, "0")} is live.</strong>
+                        <p>It has been pasted onto Tonight&apos;s Wall and is ready for canon votes.</p>
+                    </div>
+                </div>
+            )}
+
             <div className="composer" id="submission-composer">
                 {!draft ? (
                     <>
                         <div className="composer-heading">
-                            <span className="step-stamp">02 / ADD A RULE</span>
-                            <h2 id="composer-title">Your rule seed</h2>
+                            <span className="step-stamp">NOTICE DESK / OPEN</span>
+                            <h2 id="composer-title">Create a Rule</h2>
+                            <p>Start with the action, warning, or ritual people must follow tonight.</p>
                         </div>
 
                         <div className="composer-input-row">
-                            <label htmlFor="rule-seed">
-                                What must people do to survive tonight?
-                            </label>
+                            <label htmlFor="rule-seed">Rule seed</label>
                             <textarea
                                 id="rule-seed"
                                 minLength={MIN_SEED_LENGTH}
                                 maxLength={MAX_SEED_LENGTH}
                                 required
-                                placeholder="If the conductor says your name..."
+                                placeholder="e.g. If the conductor says your name, do not answer..."
                                 value={seed}
-                                onChange={(event) => setSeed(event.target.value)}
+                                onChange={(event) => updateSeed(event.target.value)}
                                 aria-describedby="rule-seed-help rule-seed-count"
                             />
                             <div className="seed-help" id="rule-seed-help">
@@ -164,14 +229,14 @@ export default function SubmissionComposer({
                                     <button
                                         key={example}
                                         type="button"
-                                        onClick={() => setSeed(example)}
+                                        onClick={() => updateSeed(example)}
                                     >
                                         {example}
                                     </button>
                                 ))}
                             </div>
                             <div className="seed-input-footer">
-                                <span>One rule idea · {MIN_SEED_LENGTH}–{MAX_SEED_LENGTH} characters</span>
+                                <span>{isAuthenticated ? "Private until you publish" : "Sign in required to generate"}</span>
                                 <span id="rule-seed-count">{seed.length} / {MAX_SEED_LENGTH}</span>
                             </div>
                             <button
@@ -181,21 +246,30 @@ export default function SubmissionComposer({
                                 onClick={() => generateResponse()}
                             >
                                 {isGenerating
-                                    ? "WRITING THE NOTICE..."
-                                    : "TURN IT INTO A NIGHT RULE →"}
+                                    ? (isAuthenticated ? "WRITING THE NOTICE..." : "OPENING GOOGLE SIGN-IN...")
+                                    : (isAuthenticated ? "GENERATE PRIVATE NOTICE →" : "SIGN IN TO CREATE →")}
                             </button>
+                            {!isAuthenticated && (
+                                <small className="guest-note">
+                                    Your seed stays in this browser while Google sign-in completes.
+                                    Browsing and voting totals remain public.
+                                </small>
+                            )}
                         </div>
                     </>
                 ) : (
                     <div className={`draft-stage${isRevealingDraft ? " is-revealing" : ""}`}>
-                        <div className="composer-heading">
-                            <span className="step-stamp">YOUR AI-GENERATED NOTICE</span>
-                            <h2 id="composer-title">Review the rule</h2>
+                        <div className="draft-paper-header">
+                            <div>
+                                <span className="step-stamp">UNPUBLISHED NOTICE</span>
+                                <h2 id="composer-title">Edit the Draft</h2>
+                            </div>
+                            <span className="draft-number">NO. {String(draft.id).padStart(3, "0")}</span>
                         </div>
                         <div className="saved-draft-label">
-                            <span aria-hidden="true">●</span> PRIVATE DRAFT · SAVED
+                            <span aria-hidden="true">●</span> PRIVATE DRAFT / SAVED TO YOUR ACCOUNT
                         </div>
-                        <label htmlFor="draft-response">Edit before posting to tonight&apos;s wall</label>
+                        <label htmlFor="draft-response">Notice copy — edit directly on the paper</label>
                         <textarea
                             id="draft-response"
                             className="draft-response"
@@ -214,7 +288,7 @@ export default function SubmissionComposer({
                                 disabled={isGenerating || isPublishing || !canGenerate}
                                 onClick={() => generateResponse(draft.id)}
                             >
-                                {isGenerating ? "WRITING ANOTHER..." : "TRY ANOTHER VERSION"}
+                                {isGenerating ? "WRITING ANOTHER..." : "REGENERATE"}
                             </button>
                             <button
                                 className="publish-button"
@@ -222,9 +296,12 @@ export default function SubmissionComposer({
                                 disabled={isPublishing || isGenerating || !draftText.trim()}
                                 onClick={publishResponse}
                             >
-                                {isPublishing ? "POSTING..." : "POST TO TONIGHT'S WALL →"}
+                                {isPublishing ? "PASTING TO THE WALL..." : "PUBLISH NOTICE →"}
                             </button>
                         </div>
+                        <p className="draft-lock-note">
+                            Publishing is final for this notice. Published notices cannot be regenerated.
+                        </p>
                     </div>
                 )}
 
@@ -235,11 +312,6 @@ export default function SubmissionComposer({
                 )}
             </div>
 
-            {publishedCaptionId && (
-                <span className="sr-only" role="status">
-                    Your rule is on tonight&apos;s wall.
-                </span>
-            )}
         </section>
     );
 }

@@ -28,7 +28,7 @@ export default function CaptionCard({
         >
             <div className="notice-fastener" aria-hidden="true" />
             <header className="rule-notice-header">
-                <span>FICTIONAL NIGHT NOTICE</span>
+                <span>PUBLISHED / TONIGHT&apos;S WALL</span>
                 <span>RANK {String(rank).padStart(2, "0")}</span>
             </header>
             {isTop && <span className="leading-rule">LEADING RULE</span>}

@@ -23,7 +23,7 @@ export default function SignOutButton() {
     return (
         <button
             type="button"
-            className="google-sign-in-button"
+            className="google-sign-in-button sign-out-button"
             onClick={handleSignOut}
         >
             Sign out

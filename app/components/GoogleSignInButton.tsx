@@ -2,7 +2,13 @@
 
 import { createClient } from "@/lib/supabase/client";
 
-export default function GoogleSignInButton() {
+type GoogleSignInButtonProps = {
+    label?: string;
+};
+
+export default function GoogleSignInButton({
+    label = "Continue with Google",
+}: GoogleSignInButtonProps) {
     async function handleSignIn() {
         const supabase = createClient();
 
@@ -34,7 +40,7 @@ export default function GoogleSignInButton() {
                 <path fill="#FBBC05" d="M6.5 14a6 6 0 0 1 0-3.9V7.4H3.1a10 10 0 0 0 0 9.2L6.5 14Z" />
                 <path fill="#EA4335" d="M12 5.9c1.5 0 2.8.5 3.9 1.5l2.9-2.9A9.8 9.8 0 0 0 3.1 7.4l3.4 2.7A5.9 5.9 0 0 1 12 5.9Z" />
             </svg>
-            Continue with Google
+            {label}
         </button>
     );
 }
