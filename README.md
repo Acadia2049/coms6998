@@ -8,17 +8,17 @@ the community votes on which rules become canon.
 
 ## Current release
 
-- Product snapshot: `2026.10.13.1`
+- Product snapshot: `2026.10.14.1`
 - Model: `gpt-6-luna`
-- Production: <https://coms6998-coms-6998.vercel.app/>
-- Source baseline: `3b49b545291c6fd008c36d1c30ebb6b8ae3a7795`
+- Production: <https://coms6998-sand.vercel.app/>
+- Source baseline: `47fb2cb9edd1e2da2f51f67de4b07f13c1c2e7cc`
 
 ## Documentation
 
 - [Usage, setup, deployment, and troubleshooting](docs/USAGE.md)
 - [Version archive](docs/versions/README.md)
-- [Current UI and AI snapshot](docs/versions/2026-10-13-openai-luna/README.md)
-- [Current rule-generation prompt](docs/versions/2026-10-13-openai-luna/prompts/rule-generation.md)
+- [Current UI and AI snapshot](docs/versions/2026-10-14-week5-iteration/README.md)
+- [Current rule-generation prompt](docs/versions/2026-10-14-week5-iteration/prompts/rule-generation.md)
 - [Local handoff](NYC_AFTER_DARK_HANDOFF.md)
 
 ## Stack

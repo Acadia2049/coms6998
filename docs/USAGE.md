@@ -6,7 +6,7 @@ README remains a short product index.
 
 ## Use the product
 
-Production URL: <https://coms6998-coms-6998.vercel.app/>
+Production URL: <https://coms6998-sand.vercel.app/>
 
 1. Browse Tonight's Wall without signing in.
 2. Select **Continue with Google** to authenticate through Supabase.
@@ -91,11 +91,11 @@ configured only for Production.
 The stable project URL is:
 
 ```text
-https://coms6998-coms-6998.vercel.app/
+https://coms6998-sand.vercel.app/
 ```
 
-Do not use `https://coms6998.vercel.app/`; it currently resolves to an older,
-different deployment.
+The archived `https://coms6998-coms-6998.vercel.app/` alias remains reachable,
+but `https://coms6998-sand.vercel.app/` is the current canonical production URL.
 
 ## Common failures
 

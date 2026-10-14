@@ -1,23 +1,24 @@
 # NYC After Dark — Local Handoff
 
-Updated: 2026-10-13 11:32 EDT (America/New_York)
+Updated: 2026-10-14 16:22 EDT (America/New_York)
 
 ## Current state
 
-- Production source: `main` at `3b49b545291c6fd008c36d1c30ebb6b8ae3a7795`
-- Production URL: <https://coms6998-coms-6998.vercel.app/>
-- Current product snapshot: `2026.10.13.1`
-- Snapshot tag: `snapshot-2026-10-13-openai-luna`
+- Production source: `main` at `47fb2cb9edd1e2da2f51f67de4b07f13c1c2e7cc`
+- Production URL: <https://coms6998-sand.vercel.app/>
+- Commit-specific deployment: <https://coms6998-arvn2b5ms-coms-6998.vercel.app/>
+- Current product snapshot: `2026.10.14.1`
+- Snapshot tag: `snapshot-2026-10-14-week5-iteration`
 
 ## Canonical documentation
 
 - Working instructions: [docs/USAGE.md](docs/USAGE.md)
 - Current immutable record:
-  [docs/versions/2026-10-13-openai-luna/README.md](docs/versions/2026-10-13-openai-luna/README.md)
+  [docs/versions/2026-10-14-week5-iteration/README.md](docs/versions/2026-10-14-week5-iteration/README.md)
 - Exact model prompt:
-  [docs/versions/2026-10-13-openai-luna/prompts/rule-generation.md](docs/versions/2026-10-13-openai-luna/prompts/rule-generation.md)
+  [docs/versions/2026-10-14-week5-iteration/prompts/rule-generation.md](docs/versions/2026-10-14-week5-iteration/prompts/rule-generation.md)
 - UI captures:
-  [docs/versions/2026-10-13-openai-luna/ui/README.md](docs/versions/2026-10-13-openai-luna/ui/README.md)
+  [docs/versions/2026-10-14-week5-iteration/ui/README.md](docs/versions/2026-10-14-week5-iteration/ui/README.md)
 
 ## Continue safely
 
