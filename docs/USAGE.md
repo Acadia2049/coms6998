@@ -14,8 +14,9 @@ Production URL: <https://coms6998-sand.vercel.app/>
 4. Generate a private AI draft.
 5. Edit the draft or regenerate it in place.
 6. Publish the draft when it is ready. Published rules cannot be regenerated.
-7. Cast one **Make Canon** vote per published rule.
-8. Open **Past Nights** to view the top three rules from each of the previous
+7. Cast one **Make Canon** vote per published rule, or click **Undo canon vote** to remove it.
+8. Use **Delete my rule** on a notice you published to remove it and its votes.
+9. Open **Past Nights** to view the top three rules from each of the previous
    seven NYC nights.
 
 ## Local setup
@@ -49,12 +50,14 @@ Apply the migrations in order:
 ```text
 supabase/migrations/20261007_week4_nyc_after_dark.sql
 supabase/migrations/20261013_allow_draft_regeneration.sql
+supabase/migrations/20261014_allow_vote_undo_and_owner_delete.sql
 ```
 
 The schema stores private drafts, published captions, nightly scenes, and
 one-vote-per-user rows. Row Level Security keeps drafts private, prevents users
-from changing another author's data, and permits only an author to replace an
-unpublished zero-vote draft.
+from changing or deleting another author's data, and lets a voter remove only
+their own vote. Vote-score triggers keep the public total in sync when votes
+are added or removed.
 
 New wall queries must match both `challenge_date` and the stable scene ID in
 `challenge_text`. Do not delete legacy caption rows.
@@ -74,7 +77,8 @@ Then verify:
 - `/` and `/past-nights` render publicly;
 - unauthenticated `POST /api/generate` returns `401`;
 - a signed-in user can generate, edit, regenerate, and publish a draft;
-- a second account can vote once and cannot vote twice;
+- a second account can vote once, undo that vote, and vote again;
+- only the published rule's owner sees the delete control and can delete it;
 - private drafts never appear on the public wall;
 - desktop and mobile layouts do not create unwanted horizontal overflow.
 

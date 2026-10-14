@@ -1,3 +1,4 @@
+import DeleteSubmissionButton from "./DeleteSubmissionButton";
 import VoteButton from "./VoteButton";
 
 type CaptionCardProps = {
@@ -6,6 +7,7 @@ type CaptionCardProps = {
     voteScore: number;
     hasVoted: boolean;
     canVote: boolean;
+    canDelete: boolean;
     index: number;
     isTop: boolean;
 };
@@ -16,6 +18,7 @@ export default function CaptionCard({
     voteScore,
     hasVoted,
     canVote,
+    canDelete,
     index,
     isTop,
 }: CaptionCardProps) {
@@ -36,15 +39,18 @@ export default function CaptionCard({
             <p className="rule-copy">{text}</p>
             <p className="ai-disclosure">AI GENERATED FROM A HUMAN SEED</p>
             <footer className="rule-notice-footer">
-                {canVote ? (
-                    <VoteButton
-                        captionId={id}
-                        initialScore={voteScore}
-                        initiallyVoted={hasVoted}
-                    />
-                ) : (
-                    <span className="vote-login-note">Sign in to vote · {voteScore} canon votes</span>
-                )}
+                <div className="rule-card-actions">
+                    {canVote ? (
+                        <VoteButton
+                            captionId={id}
+                            initialScore={voteScore}
+                            initiallyVoted={hasVoted}
+                        />
+                    ) : (
+                        <span className="vote-login-note">Sign in to vote · {voteScore} canon votes</span>
+                    )}
+                    {canDelete && <DeleteSubmissionButton captionId={id} />}
+                </div>
             </footer>
         </article>
     );

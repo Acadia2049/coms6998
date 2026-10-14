@@ -980,6 +980,8 @@ body {
 
 .rule-notice-footer { padding-top: 13px; border-top: 1px solid rgba(23, 24, 23, 0.28); }
 
+.rule-card-actions { display: grid; min-width: 0; gap: 8px; }
+
 .notice-site .vote-control { position: relative; display: block; min-width: 0; }
 
 .notice-site .vote-button {
@@ -1004,6 +1006,29 @@ body {
 .notice-site .vote-button strong { flex: 0 0 auto; margin-left: auto; }
 .notice-site .vote-button:not(:disabled):hover { background: var(--ink); color: var(--paper); }
 .notice-site .vote-button.voted { background: var(--ink); color: var(--yellow); }
+
+.notice-site .delete-submission-button {
+  width: 100%;
+  min-height: 32px;
+  padding: 7px 10px;
+  border: 1px solid rgba(126, 37, 31, 0.58);
+  background: transparent;
+  color: #7e251f;
+  cursor: pointer;
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 7px;
+  font-weight: 900;
+  letter-spacing: 0.055em;
+  text-transform: uppercase;
+}
+
+.notice-site .delete-submission-button:not(:disabled):hover {
+  background: #7e251f;
+  color: var(--paper);
+}
+
+.notice-site .delete-submission-button:disabled,
+.notice-site .vote-button:disabled { cursor: wait; opacity: 0.68; }
 
 .canon-stamp {
   position: absolute;
@@ -1202,7 +1227,8 @@ body {
 .notice-site .seed-help button:focus-visible,
 .notice-site .google-sign-in-button:focus-visible,
 .notice-site a:focus-visible,
-.notice-site .vote-button:focus-visible {
+.notice-site .vote-button:focus-visible,
+.notice-site .delete-submission-button:focus-visible {
   outline: 3px solid var(--yellow);
   outline-offset: 3px;
 }

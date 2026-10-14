@@ -31,9 +31,10 @@ export default async function Home() {
 
     let initialDraft: Draft | null = null;
     const votedCaptionIds = new Set<number>();
+    const ownedCaptionIds = new Set<number>();
 
     if (user) {
-        const [{ data: draft }, { data: votes }] = await Promise.all([
+        const [{ data: draft }, { data: votes }, { data: ownedCaptions }] = await Promise.all([
             supabase
                 .from("captions")
                 .select("id, text, prompt")
@@ -45,6 +46,13 @@ export default async function Home() {
                 .limit(1)
                 .maybeSingle(),
             supabase.from("votes").select("caption_id").eq("user_id", user.id),
+            supabase
+                .from("captions")
+                .select("id")
+                .eq("user_id", user.id)
+                .eq("challenge_date", challenge.date)
+                .eq("challenge_text", challenge.id)
+                .not("published_at", "is", null),
         ]);
 
         initialDraft = draft
@@ -55,6 +63,7 @@ export default async function Home() {
             }
             : null;
         votes?.forEach((vote) => votedCaptionIds.add(vote.caption_id));
+        ownedCaptions?.forEach((caption) => ownedCaptionIds.add(caption.id));
     }
 
     const formattedDate = new Intl.DateTimeFormat("en-US", {
@@ -154,6 +163,7 @@ export default async function Home() {
                                     voteScore={caption.vote_score}
                                     hasVoted={votedCaptionIds.has(caption.id)}
                                     canVote={Boolean(user)}
+                                    canDelete={ownedCaptionIds.has(caption.id)}
                                     index={index}
                                     isTop={index === 0}
                                 />

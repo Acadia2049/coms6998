@@ -17,19 +17,20 @@ export default function VoteButton({
     const [hasVoted, setHasVoted] = useState(initiallyVoted);
     const [isVoting, setIsVoting] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
-    const [justStamped, setJustStamped] = useState(false);
+    const [stampText, setStampText] = useState("");
 
     async function vote() {
-        if (hasVoted || isVoting) {
+        if (isVoting) {
             return;
         }
 
+        const isUndoing = hasVoted;
         setIsVoting(true);
         setErrorMessage("");
 
         try {
             const response = await fetch("/api/votes", {
-                method: "POST",
+                method: isUndoing ? "DELETE" : "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ captionId }),
             });
@@ -39,13 +40,15 @@ export default function VoteButton({
             };
 
             if (!response.ok) {
-                throw new Error(payload.error ?? "Could not save your vote.");
+                throw new Error(
+                    payload.error ?? (isUndoing ? "Could not remove your vote." : "Could not save your vote.")
+                );
             }
 
-            setHasVoted(true);
-            setScore(payload.voteScore ?? score + 1);
-            setJustStamped(true);
-            window.setTimeout(() => setJustStamped(false), 650);
+            setHasVoted(!isUndoing);
+            setScore(payload.voteScore ?? (isUndoing ? Math.max(score - 1, 0) : score + 1));
+            setStampText(isUndoing ? "REMOVED" : "COUNTED");
+            window.setTimeout(() => setStampText(""), 650);
         } catch (error) {
             setErrorMessage(error instanceof Error ? error.message : "Vote failed.");
         } finally {
@@ -54,19 +57,19 @@ export default function VoteButton({
     }
 
     return (
-        <div className={`vote-control${justStamped ? " stamp-active" : ""}`}>
+        <div className={`vote-control${stampText ? " stamp-active" : ""}`}>
             <button
                 className={hasVoted ? "vote-button voted" : "vote-button"}
                 type="button"
-                disabled={hasVoted || isVoting}
+                disabled={isVoting}
                 onClick={vote}
-                aria-label={hasVoted ? `Canon vote cast. ${score} votes` : `Make canon. ${score} votes`}
+                aria-label={hasVoted ? `Undo canon vote. ${score} votes` : `Make canon. ${score} votes`}
             >
-                <span aria-hidden="true">{hasVoted ? "✓" : "+"}</span>
-                <span>{hasVoted ? "Canon vote cast" : "Make canon"}</span>
+                <span aria-hidden="true">{hasVoted ? "−" : "+"}</span>
+                <span>{isVoting ? "Updating…" : hasVoted ? "Undo canon vote" : "Make canon"}</span>
                 <strong>{score}</strong>
             </button>
-            {justStamped && <span className="canon-stamp" aria-hidden="true">COUNTED</span>}
+            {stampText && <span className="canon-stamp" aria-hidden="true">{stampText}</span>}
             {errorMessage && <span className="vote-error">{errorMessage}</span>}
         </div>
     );
