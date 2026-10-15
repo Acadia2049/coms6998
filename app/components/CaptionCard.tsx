@@ -29,15 +29,14 @@ export default function CaptionCard({
             className={`rule-notice notice-variant-${(index % 3) + 1}`}
             data-caption-id={id}
         >
-            <div className="notice-fastener" aria-hidden="true" />
             <header className="rule-notice-header">
-                <span>PUBLISHED / TONIGHT&apos;S WALL</span>
-                <span>RANK {String(rank).padStart(2, "0")}</span>
+                <span>ACTIVE / NIGHT GUIDANCE</span>
+                <span>PRIORITY {String(rank).padStart(2, "0")}</span>
             </header>
-            {isTop && <span className="leading-rule">LEADING RULE</span>}
-            <span className="rule-number">RULE #{String(id).padStart(3, "0")}</span>
+            {isTop && <span className="leading-rule">CURRENT PRIMARY</span>}
+            <span className="rule-number">NOTICE {String(id).padStart(4, "0")}</span>
             <p className="rule-copy">{text}</p>
-            <p className="ai-disclosure">AI GENERATED FROM A HUMAN SEED</p>
+            <p className="ai-disclosure">PUBLIC SUBMISSION · AI-ASSISTED EDIT</p>
             <footer className="rule-notice-footer">
                 <div className="rule-card-actions">
                     {canVote ? (

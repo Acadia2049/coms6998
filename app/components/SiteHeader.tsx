@@ -16,8 +16,8 @@ export default function SiteHeader({
         <>
             <header className="site-header">
                 <Link className="site-brand" href="/" aria-label="NYC After Dark home">
-                    <span className="site-brand-city">NYC</span>
-                    <span>AFTER DARK</span>
+                    <span className="site-brand-city" aria-hidden="true">N</span>
+                    <span className="site-brand-name">NYC AFTER DARK<small>Night Notice Archive</small></span>
                 </Link>
 
                 <nav className="site-nav" aria-label="Main navigation">
@@ -25,16 +25,16 @@ export default function SiteHeader({
                         href="/"
                         aria-current={currentPage === "tonight" ? "page" : undefined}
                     >
-                        Tonight
+                        Live notice
                     </Link>
                     <Link
                         href="/past-nights"
                         aria-current={currentPage === "archive" ? "page" : undefined}
                     >
-                        Past Nights
+                        Archive
                     </Link>
                     <Link className="write-rule-link" href="/#submission-composer">
-                        Write a Rule <span aria-hidden="true">↘</span>
+                        Submit guidance <span aria-hidden="true">↘</span>
                     </Link>
                 </nav>
 
@@ -56,11 +56,11 @@ export default function SiteHeader({
                     aria-current={currentPage === "tonight" ? "page" : undefined}
                 >
                     <span aria-hidden="true">01</span>
-                    Tonight
+                    Live
                 </Link>
                 <Link href="/#submission-composer">
                     <span aria-hidden="true">+</span>
-                    Create
+                    Submit
                 </Link>
                 <Link
                     href="/past-nights"

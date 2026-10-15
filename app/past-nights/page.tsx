@@ -35,18 +35,26 @@ export default async function PastNightsPage() {
 
     return (
         <div className="notice-site archive-site">
-            <div className="wall-grain" aria-hidden="true" />
             <SiteHeader isAuthenticated={Boolean(user)} currentPage="archive" />
 
             <main className="archive-main">
                 <header className="archive-hero">
-                    <span className="section-index">THE OFFICIAL RECORD / LAST 7 NIGHTS</span>
-                    <h1>Past Nights</h1>
+                    <span className="section-index">CLOSED RECORDS / PREVIOUS 07 NIGHTS</span>
+                    <h1>Night archive</h1>
                     <p>
-                        Voting is closed. Each night&apos;s top three notices are preserved as canon;
-                        the highest-ranked entry becomes the primary rule.
+                        Each file closes at midnight. The three most confirmed notices remain;
+                        the highest-ranked instruction is marked primary.
                     </p>
                 </header>
+
+                <div className="archive-key" aria-label="Archive status">
+                    <span>RECORD WINDOW</span>
+                    <strong>07 NIGHTS</strong>
+                    <span>EDITING</span>
+                    <strong>CLOSED</strong>
+                    <span>ORDER</span>
+                    <strong>NEWEST FIRST</strong>
+                </div>
 
                 {error ? (
                     <div className="wall-state wall-error">
@@ -85,7 +93,7 @@ export default async function PastNightsPage() {
                                             <h2>{night.location}</h2>
                                         </div>
                                         <strong>
-                                            {rules.length} {rules.length === 1 ? "RULE" : "RULES"} BECAME CANON
+                                            {String(rules.length).padStart(2, "0")} PRESERVED
                                         </strong>
                                     </header>
 
@@ -95,16 +103,16 @@ export default async function PastNightsPage() {
                                                 <li className={index === 0 ? "primary-canon" : ""} key={rule.id}>
                                                     <div className="canon-rank">
                                                         <span>#{index + 1}</span>
-                                                        <small>{index === 0 ? "NIGHT'S PRIMARY RULE" : "CANON"}</small>
+                                                        <small>{index === 0 ? "PRIMARY GUIDANCE" : "PRESERVED NOTICE"}</small>
                                                     </div>
                                                     <p>{rule.text}</p>
-                                                    <span className="canon-votes">{rule.vote_score} CANON VOTES</span>
+                                                    <span className="canon-votes">{rule.vote_score} CONFIRMATIONS</span>
                                                 </li>
                                             ))}
                                         </ol>
                                     ) : (
                                         <div className="archive-empty-night">
-                                            No rules from this night entered the new archive.
+                                            RECORD INCOMPLETE / NO GUIDANCE WAS PRESERVED
                                         </div>
                                     )}
                                 </section>

@@ -14,13 +14,13 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "NYC After Dark",
-    description: "Write one rule. AI makes it unsettling. The city decides if it becomes canon.",
+  title: "NYC After Dark — Night Notice Archive",
+    description: "A fictional public archive of the rules New Yorkers follow after dark.",
 };
 
 export const viewport: Viewport = {
-    themeColor: "#121313",
-  colorScheme: "dark",
+    themeColor: "#10110f",
+  colorScheme: "light dark",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
