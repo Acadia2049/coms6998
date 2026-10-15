@@ -30,13 +30,12 @@ export default function CaptionCard({
             data-caption-id={id}
         >
             <header className="rule-notice-header">
-                <span>ACTIVE / NIGHT GUIDANCE</span>
-                <span>PRIORITY {String(rank).padStart(2, "0")}</span>
+                <span>Anonymous warning</span>
+                <span>#{String(rank).padStart(2, "0")}</span>
             </header>
-            {isTop && <span className="leading-rule">CURRENT PRIMARY</span>}
-            <span className="rule-number">NOTICE {String(id).padStart(4, "0")}</span>
+            {isTop && <span className="leading-rule">Most confirmed tonight</span>}
             <p className="rule-copy">{text}</p>
-            <p className="ai-disclosure">PUBLIC SUBMISSION · AI-ASSISTED EDIT</p>
+            <p className="ai-disclosure">Community submission · AI helped edit the wording</p>
             <footer className="rule-notice-footer">
                 <div className="rule-card-actions">
                     {canVote ? (

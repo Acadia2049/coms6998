@@ -4,10 +4,12 @@ import { createClient } from "@/lib/supabase/client";
 
 type GoogleSignInButtonProps = {
     label?: string;
+    returnTo?: string;
 };
 
 export default function GoogleSignInButton({
     label = "Continue with Google",
+    returnTo = "/",
 }: GoogleSignInButtonProps) {
     async function handleSignIn() {
         const supabase = createClient();
@@ -15,7 +17,7 @@ export default function GoogleSignInButton({
         const { error } = await supabase.auth.signInWithOAuth({
             provider: "google",
             options: {
-                redirectTo: `${window.location.origin}/auth/callback`,
+                redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(returnTo)}`,
             },
         });
 

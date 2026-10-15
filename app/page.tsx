@@ -1,21 +1,53 @@
+import Image from "next/image";
+import Link from "next/link";
+import type { CSSProperties } from "react";
+
 import CaptionCard from "@/app/components/CaptionCard";
+import EvidenceNote from "@/app/components/EvidenceNote";
+import ScrollReveal from "@/app/components/ScrollReveal";
 import SiteFooter from "@/app/components/SiteFooter";
 import SiteHeader from "@/app/components/SiteHeader";
-import SubmissionComposer from "@/app/components/SubmissionComposer";
-import { extractSeedFromGenerationPrompt, getTonightChallenge } from "@/lib/challenges";
+import {
+    getNightSceneById,
+    getTonightChallenge,
+    type DailyChallenge,
+} from "@/lib/challenges";
+import { getSceneVisual } from "@/lib/scene-visuals";
 import { createClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
 
-type Draft = {
-    id: number;
-    text: string;
-    seed: string;
+type HomePageProps = {
+    searchParams: Promise<{ scene?: string | string[] }>;
 };
 
-export default async function Home() {
+function getDevelopmentPreview(
+    challenge: DailyChallenge,
+    requestedSceneId: string | string[] | undefined
+) {
+    if (process.env.NODE_ENV !== "development" || typeof requestedSceneId !== "string") {
+        return challenge;
+    }
+
+    const scene = getNightSceneById(requestedSceneId);
+
+    if (!scene) {
+        return challenge;
+    }
+
+    return {
+        ...scene,
+        date: challenge.date,
+        text: `${scene.incident} ${scene.prompt}`,
+        description: `${scene.location} · ${scene.time}`,
+    } satisfies DailyChallenge;
+}
+
+export default async function Home({ searchParams }: HomePageProps) {
     const supabase = await createClient();
-    const challenge = getTonightChallenge();
+    const baseChallenge = getTonightChallenge();
+    const challenge = getDevelopmentPreview(baseChallenge, (await searchParams).scene);
+    const visual = getSceneVisual(challenge.id);
     const {
         data: { user },
     } = await supabase.auth.getUser();
@@ -29,22 +61,11 @@ export default async function Home() {
         .order("vote_score", { ascending: false })
         .order("published_at", { ascending: true });
 
-    let initialDraft: Draft | null = null;
     const votedCaptionIds = new Set<number>();
     const ownedCaptionIds = new Set<number>();
 
     if (user) {
-        const [{ data: draft }, { data: votes }, { data: ownedCaptions }] = await Promise.all([
-            supabase
-                .from("captions")
-                .select("id, text, prompt")
-                .eq("user_id", user.id)
-                .eq("challenge_date", challenge.date)
-                .eq("challenge_text", challenge.id)
-                .is("published_at", null)
-                .order("created_at", { ascending: false })
-                .limit(1)
-                .maybeSingle(),
+        const [{ data: votes }, { data: ownedCaptions }] = await Promise.all([
             supabase.from("votes").select("caption_id").eq("user_id", user.id),
             supabase
                 .from("captions")
@@ -55,156 +76,145 @@ export default async function Home() {
                 .not("published_at", "is", null),
         ]);
 
-        initialDraft = draft
-            ? {
-                id: draft.id,
-                text: draft.text,
-                seed: extractSeedFromGenerationPrompt(draft.prompt ?? ""),
-            }
-            : null;
         votes?.forEach((vote) => votedCaptionIds.add(vote.caption_id));
         ownedCaptions?.forEach((caption) => ownedCaptionIds.add(caption.id));
     }
 
     const formattedDate = new Intl.DateTimeFormat("en-US", {
-        weekday: "short",
-        month: "short",
+        weekday: "long",
+        month: "long",
         day: "numeric",
+        year: "numeric",
         timeZone: "America/New_York",
     }).format(new Date(`${challenge.date}T12:00:00-04:00`));
+    const isLongTitle = challenge.location.length > 29;
+    const warningCount = captions?.length ?? 0;
 
     return (
-        <div className="notice-site">
+        <div className="notice-site home-site found-archive">
             <SiteHeader isAuthenticated={Boolean(user)} currentPage="tonight" />
 
-            <main>
-                <section className="hero-shell" aria-labelledby="hero-title">
-                    <div className="hero-copy">
-                        <div className="hero-status-line">
-                            <p className="hero-eyebrow">NIGHT SERVICE / {formattedDate.toUpperCase()}</p>
-                            <span><i aria-hidden="true" /> LIVE RECORD</span>
-                        </div>
-                        <h1 id="hero-title">There are rules for getting home.</h1>
-                        <p className="hero-intro">
-                            One impossible incident is recorded every night. New Yorkers write
-                            the guidance the city forgot to issue.
-                        </p>
+            <main className="found-archive-main">
+                <section className="archive-dossier" aria-labelledby="incident-title">
+                    <span className="dossier-tab">OPEN CASE · {challenge.date.replaceAll("-", ".")}</span>
 
-                        <article className="scene-notice" aria-labelledby="scene-location">
-                            <div className="scene-notice-topline">
-                                <span>ACTIVE INCIDENT BULLETIN</span>
-                                <span>FILE {challenge.date.replaceAll("-", ".")}</span>
-                            </div>
-                            <div className="scene-location-row">
-                                <div>
-                                    <span className="scene-label">LOCATION / NIGHT ACCESS</span>
-                                    <h2 id="scene-location">{challenge.location}</h2>
-                                </div>
-                                <time>{challenge.time}</time>
-                            </div>
-                            <p className="scene-incident">{challenge.incident}</p>
-                            <div className="scene-prompt-block">
-                                <span>PUBLIC GUIDANCE REQUESTED</span>
-                                <p className="scene-question">{challenge.prompt}</p>
-                            </div>
-                            <dl className="incident-meta">
-                                <div><dt>STATUS</dt><dd>UNRESOLVED</dd></div>
-                                <div><dt>VALID UNTIL</dt><dd>SUNRISE</dd></div>
-                                <div><dt>JURISDICTION</dt><dd>FIVE BOROUGHS</dd></div>
-                            </dl>
-                        </article>
-                    </div>
-
-                    <aside className="hero-action" aria-label="Create tonight's rule">
-                        <div className="creator-context">
-                            <span className="section-index">SUBMIT GUIDANCE / DESK 01</span>
-                            <p>Draft privately. Publish only when the instruction is precise.</p>
-                        </div>
-                        <SubmissionComposer
-                            initialDraft={initialDraft}
-                            isAuthenticated={Boolean(user)}
-                        />
-                    </aside>
-                </section>
-
-                <section className="tonight-wall" id="tonights-wall" aria-labelledby="wall-title">
-                    <header className="section-heading">
+                    <header className="dossier-header">
                         <div>
-                            <span className="section-index">COMMUNITY RECORD / RANKED IN REAL TIME</span>
-                            <h2 id="wall-title">Active guidance</h2>
-                            <p>One vote confirms a notice. Vote again to withdraw your confirmation.</p>
+                            <span>NYC AFTER DARK / COMMUNITY INCIDENT FILE</span>
+                            <strong>RECORD {challenge.id.toUpperCase()}</strong>
                         </div>
-                        <div className="wall-count" aria-label={`${captions?.length ?? 0} rules posted`}>
-                            <strong>{String(captions?.length ?? 0).padStart(2, "0")}</strong>
-                            <span>ACTIVE<br />NOTICES</span>
-                        </div>
+                        <dl>
+                            <div>
+                                <dt>Status</dt>
+                                <dd className="tampered-status">
+                                    <span aria-hidden="true">Closed</span>
+                                    <strong>Unresolved</strong>
+                                </dd>
+                            </div>
+                            <div><dt>Received</dt><dd>{challenge.time}</dd></div>
+                        </dl>
                     </header>
 
-                    <div className="wall-legend" aria-label="Notice status key">
-                        <span><i className="legend-active" aria-hidden="true" /> Active tonight</span>
-                        <span><i className="legend-leading" aria-hidden="true" /> Current primary</span>
-                        <span>Archive closes at NYC midnight</span>
-                    </div>
+                    <div className="dossier-body">
+                        <div className="dossier-copy">
+                            <p className="dossier-date">{formattedDate}</p>
+                            <p className="dossier-section-label">Incident report</p>
+                            <h1
+                                className={isLongTitle ? "dossier-title dossier-title-long" : "dossier-title"}
+                                id="incident-title"
+                            >
+                                {challenge.location}
+                            </h1>
+                            <blockquote>{challenge.incident}</blockquote>
+                            <p className="dossier-handnote" aria-label="Archivist note">
+                                {visual.marginNote}
+                            </p>
 
-                    {captionsError ? (
-                        <div className="wall-state wall-error">
-                            The wall is temporarily covered. Try refreshing.
-                        </div>
-                    ) : !captions?.length ? (
-                        <div className="wall-state wall-empty">
-                            <span className="empty-symbol" aria-hidden="true">!</span>
-                            <div>
-                                <h3>No notices have been posted.</h3>
-                                <p>Tonight&apos;s first rule could become the first entry in the archive.</p>
+                            <div className="dossier-actions" aria-label="Tonight's incident actions">
+                                <Link className="dossier-action-primary" href="#tonights-wall">
+                                    Read Warnings
+                                </Link>
+                                <Link className="dossier-action-secondary" href="/write">
+                                    Write a Rule
+                                </Link>
                             </div>
                         </div>
-                    ) : (
-                        <div className="rule-grid">
-                            {captions.map((caption, index) => (
-                                <CaptionCard
-                                    key={caption.id}
-                                    id={caption.id}
-                                    text={caption.text}
-                                    voteScore={caption.vote_score}
-                                    hasVoted={votedCaptionIds.has(caption.id)}
-                                    canVote={Boolean(user)}
-                                    canDelete={ownedCaptionIds.has(caption.id)}
-                                    index={index}
-                                    isTop={index === 0}
+
+                        <figure className="dossier-photo">
+                            <div className="dossier-photo-frame">
+                                <Image
+                                    className="incident-photo"
+                                    src={visual.image}
+                                    alt={visual.imageAlt}
+                                    fill
+                                    priority
+                                    sizes="(max-width: 760px) 92vw, 39vw"
+                                    style={{
+                                        objectPosition: visual.imagePosition,
+                                        "--mobile-object-position": visual.mobileImagePosition,
+                                    } as CSSProperties}
                                 />
-                            ))}
-                        </div>
-                    )}
+                            </div>
+                            <figcaption>
+                                <span>FIELD IMAGE / {visual.routeLabel}</span>
+                                <span>FILED {challenge.time}</span>
+                            </figcaption>
+                            <EvidenceNote
+                                detail={visual.folioDetail}
+                                hiddenNote={visual.hiddenNote}
+                                title={visual.folioTitle}
+                                variant={visual.folioVariant}
+                            />
+                        </figure>
+                    </div>
+
+                    <footer className="dossier-footer">
+                        <span>PUBLIC COPY · ANONYMOUSLY MAINTAINED</span>
+                        <span>REPORT REMAINS OPEN UNTIL NYC MIDNIGHT</span>
+                    </footer>
                 </section>
 
-                <section className="how-section" id="how-it-works" aria-labelledby="how-title">
-                    <header>
-                        <span className="section-index">ARCHIVE PROTOCOL / 03 STEPS</span>
-                        <h2 id="how-title">How a rule enters the record</h2>
-                    </header>
-                    <div className="how-grid">
-                        <article>
-                            <span>01</span>
+                <section className="tonight-wall archive-addenda" id="tonights-wall" aria-labelledby="wall-title">
+                    <ScrollReveal>
+                        <header className="addenda-heading">
                             <div>
-                                <h3>Report a rule</h3>
-                                <p>Describe one action, warning, or ritual in 10–180 characters.</p>
+                                <span>Warnings left by anonymous New Yorkers</span>
+                                <h2 id="wall-title">Tonight&apos;s Wall</h2>
+                                <p>Warnings added to tonight&apos;s open incident file.</p>
                             </div>
-                        </article>
-                        <article>
-                            <span>02</span>
-                            <div>
-                                <h3>Review the language</h3>
-                                <p>An AI-assisted editor shapes a private draft. You approve every word.</p>
+                            <p className="addenda-count" aria-label={`${warningCount} warnings posted`}>
+                                <strong>{String(warningCount).padStart(2, "0")}</strong>
+                                <span>Warnings posted</span>
+                            </p>
+                        </header>
+
+                        {captionsError ? (
+                            <div className="wall-state wall-error">
+                                The wall is temporarily covered. Try refreshing.
                             </div>
-                        </article>
-                        <article>
-                            <span>03</span>
-                            <div>
-                                <h3>Enter the archive</h3>
-                                <p>Community confirmations decide which three notices survive the night.</p>
+                        ) : !captions?.length ? (
+                            <div className="addenda-empty">
+                                <p>No warnings have been posted.</p>
+                                <Link href="/write">Be the first to write a rule</Link>
                             </div>
-                        </article>
-                    </div>
+                        ) : (
+                            <div className="rule-grid">
+                                {captions.map((caption, index) => (
+                                    <CaptionCard
+                                        key={caption.id}
+                                        id={caption.id}
+                                        text={caption.text}
+                                        voteScore={caption.vote_score}
+                                        hasVoted={votedCaptionIds.has(caption.id)}
+                                        canVote={Boolean(user)}
+                                        canDelete={ownedCaptionIds.has(caption.id)}
+                                        index={index}
+                                        isTop={index === 0}
+                                    />
+                                ))}
+                            </div>
+                        )}
+                    </ScrollReveal>
                 </section>
             </main>
 

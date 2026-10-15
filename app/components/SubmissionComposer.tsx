@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 import { createClient } from "@/lib/supabase/client";
@@ -14,6 +15,8 @@ type Draft = {
 type SubmissionComposerProps = {
     initialDraft?: Draft | null;
     isAuthenticated: boolean;
+    returnToWallHref?: string;
+    showIntro?: boolean;
 };
 
 const MIN_SEED_LENGTH = 10;
@@ -29,6 +32,8 @@ const SEED_EXAMPLES = [
 export default function SubmissionComposer({
     initialDraft = null,
     isAuthenticated,
+    returnToWallHref = "/#tonights-wall",
+    showIntro = true,
 }: SubmissionComposerProps) {
     const router = useRouter();
     const [seed, setSeed] = useState(initialDraft?.seed ?? "");
@@ -95,7 +100,7 @@ export default function SubmissionComposer({
                 const { error } = await supabase.auth.signInWithOAuth({
                     provider: "google",
                     options: {
-                        redirectTo: `${window.location.origin}/auth/callback`,
+                        redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent("/write")}`,
                     },
                 });
 
@@ -179,7 +184,7 @@ export default function SubmissionComposer({
 
     return (
         <section
-            className={`creation-zone${isPasting ? " is-pasting" : ""}`}
+            className={`creation-zone${isPasting ? " is-pasting" : ""}${showIntro ? "" : " no-composer-intro"}`}
             aria-labelledby="composer-title"
         >
             <ol className="composer-progress" aria-label="Creation progress">
@@ -198,6 +203,9 @@ export default function SubmissionComposer({
                     <div>
                         <strong>Notice #{String(publishedCaptionId).padStart(3, "0")} is live.</strong>
                         <p>It has been pasted onto Tonight&apos;s Wall and is ready for canon votes.</p>
+                        <Link className="published-wall-link" href={returnToWallHref}>
+                            Return to Tonight&apos;s Wall
+                        </Link>
                     </div>
                 </div>
             )}
@@ -205,14 +213,18 @@ export default function SubmissionComposer({
             <div className="composer" id="submission-composer">
                 {!draft ? (
                     <>
-                        <div className="composer-heading">
-                            <span className="step-stamp">NOTICE DESK / OPEN</span>
-                            <h2 id="composer-title">Create a Rule</h2>
-                            <p>Start with the action, warning, or ritual people must follow tonight.</p>
-                        </div>
+                        {showIntro ? (
+                            <div className="composer-heading">
+                                <span className="step-stamp">SUPPLEMENTAL RECORD / OPEN</span>
+                                <h2 id="composer-title">Add a Warning</h2>
+                                <p>Start with the action, warning, or ritual people must follow tonight.</p>
+                            </div>
+                        ) : (
+                            <h2 className="sr-only" id="composer-title">New warning record</h2>
+                        )}
 
                         <div className="composer-input-row">
-                            <label htmlFor="rule-seed">Rule seed</label>
+                            <label htmlFor="rule-seed">Your original instruction</label>
                             <textarea
                                 id="rule-seed"
                                 minLength={MIN_SEED_LENGTH}
@@ -247,7 +259,7 @@ export default function SubmissionComposer({
                             >
                                 {isGenerating
                                     ? (isAuthenticated ? "WRITING THE NOTICE..." : "OPENING GOOGLE SIGN-IN...")
-                                    : (isAuthenticated ? "GENERATE PRIVATE NOTICE →" : "SIGN IN TO CREATE →")}
+                                    : (isAuthenticated ? "GENERATE PRIVATE NOTICE" : "SIGN IN TO CREATE")}
                             </button>
                             {!isAuthenticated && (
                                 <small className="guest-note">
@@ -296,7 +308,7 @@ export default function SubmissionComposer({
                                 disabled={isPublishing || isGenerating || !draftText.trim()}
                                 onClick={publishResponse}
                             >
-                                {isPublishing ? "PASTING TO THE WALL..." : "PUBLISH NOTICE →"}
+                                {isPublishing ? "PASTING TO THE WALL..." : "PUBLISH NOTICE"}
                             </button>
                         </div>
                         <p className="draft-lock-note">

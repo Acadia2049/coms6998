@@ -5,7 +5,7 @@ import SignOutButton from "./SignOutButton";
 
 type SiteHeaderProps = {
     isAuthenticated: boolean;
-    currentPage: "tonight" | "archive";
+    currentPage: "tonight" | "archive" | "write";
 };
 
 export default function SiteHeader({
@@ -16,8 +16,8 @@ export default function SiteHeader({
         <>
             <header className="site-header">
                 <Link className="site-brand" href="/" aria-label="NYC After Dark home">
-                    <span className="site-brand-city" aria-hidden="true">N</span>
-                    <span className="site-brand-name">NYC AFTER DARK<small>Night Notice Archive</small></span>
+                    <span className="site-brand-city" aria-hidden="true">NYC</span>
+                    <span className="site-brand-name">AFTER DARK</span>
                 </Link>
 
                 <nav className="site-nav" aria-label="Main navigation">
@@ -25,16 +25,20 @@ export default function SiteHeader({
                         href="/"
                         aria-current={currentPage === "tonight" ? "page" : undefined}
                     >
-                        Live notice
+                        Tonight
                     </Link>
                     <Link
                         href="/past-nights"
                         aria-current={currentPage === "archive" ? "page" : undefined}
                     >
-                        Archive
+                        Past Nights
                     </Link>
-                    <Link className="write-rule-link" href="/#submission-composer">
-                        Submit guidance <span aria-hidden="true">↘</span>
+                    <Link
+                        className="write-rule-link"
+                        href="/write"
+                        aria-current={currentPage === "write" ? "page" : undefined}
+                    >
+                        Write a Rule
                     </Link>
                 </nav>
 
@@ -45,7 +49,10 @@ export default function SiteHeader({
                             <SignOutButton />
                         </>
                     ) : (
-                        <GoogleSignInButton label="Sign in" />
+                        <GoogleSignInButton
+                            label="Sign in"
+                            returnTo={currentPage === "write" ? "/write" : "/"}
+                        />
                     )}
                 </div>
             </header>
@@ -56,18 +63,21 @@ export default function SiteHeader({
                     aria-current={currentPage === "tonight" ? "page" : undefined}
                 >
                     <span aria-hidden="true">01</span>
-                    Live
+                    Tonight
                 </Link>
-                <Link href="/#submission-composer">
+                <Link
+                    href="/write"
+                    aria-current={currentPage === "write" ? "page" : undefined}
+                >
                     <span aria-hidden="true">+</span>
-                    Submit
+                    Write
                 </Link>
                 <Link
                     href="/past-nights"
                     aria-current={currentPage === "archive" ? "page" : undefined}
                 >
                     <span aria-hidden="true">07</span>
-                    Archive
+                    Past
                 </Link>
             </nav>
         </>
