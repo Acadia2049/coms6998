@@ -1,0 +1,77 @@
+{
+  "schemaVersion": 1,
+  "snapshotVersion": "2026.10.15.1",
+  "snapshotId": "2026-10-15-vote-undo-owner-delete",
+  "capturedAt": "2026-10-15T01:17:12-04:00",
+  "timezone": "America/New_York",
+  "source": {
+    "branch": "main",
+    "commit": "6eba51b7e7f1737bbd9fac8a8f96f351e4db52ba",
+    "archiveTag": "snapshot-2026-10-15-vote-undo-owner-delete",
+    "packageVersion": "0.1.0"
+  },
+  "deployment": {
+    "provider": "Vercel",
+    "stableUrl": "https://coms6998-sand.vercel.app/",
+    "deploymentUrl": "https://coms6998-onxuw2tvj-coms-6998.vercel.app/",
+    "vercelDeploymentId": "5mecegQ1MiwDBL4Mv3h8jGLeQRBN",
+    "githubDeploymentId": 7076889110,
+    "completedAt": "2026-10-14T17:14:39-04:00",
+    "status": "success"
+  },
+  "features": [
+    "Fourteen rotating NYC night scenes",
+    "Public Tonight's Wall and seven-night archive",
+    "Google authentication through Supabase",
+    "Private editable and regenerable AI drafts",
+    "One Make Canon vote per user and rule",
+    "Authenticated vote removal and re-voting",
+    "Owner-only published-rule deletion with vote cleanup",
+    "Responsive desktop navigation and mobile action dock",
+    "Stable scene IDs and Row Level Security"
+  ],
+  "ai": {
+    "provider": "OpenAI",
+    "api": "Responses API",
+    "model": "gpt-6-luna",
+    "reasoningEffort": "none",
+    "serviceTier": "fast",
+    "maxOutputTokens": 100,
+    "timeoutMs": 6000,
+    "minimumWords": 15,
+    "maximumWords": 40,
+    "store": false,
+    "automaticRetries": 0,
+    "promptFile": "prompts/rule-generation.md"
+  },
+  "databaseMigrations": [
+    "supabase/migrations/20261007_week4_nyc_after_dark.sql",
+    "supabase/migrations/20261013_allow_draft_regeneration.sql",
+    "supabase/migrations/20261014_allow_vote_undo_and_owner_delete.sql"
+  ],
+  "knownIssues": [
+    "A complete signed-in production generate-to-delete flow is not recorded in this snapshot.",
+    "The server-only OpenAI key was not verified by the unauthenticated deployment probe.",
+    "The new Supabase migration must be applied to the active project before the new mutation paths can work."
+  ],
+  "ui": [
+    {
+      "file": "ui/homepage-desktop-1440.png",
+      "width": 1440,
+      "height": 2156,
+      "sha256": "dc8489b3991d8395ca7d615f6916711dcfb57245eabe42582d888294d291fea5"
+    },
+    {
+      "file": "ui/homepage-mobile-390.png",
+      "width": 390,
+      "height": 2948,
+      "sha256": "7b078203a4483f928009134c29fcdf4465b0ad7ce8591d60519913b8a1e663c9"
+    },
+    {
+      "file": "ui/past-nights-desktop-1440.png",
+      "width": 1440,
+      "height": 2559,
+      "sha256": "07f6b0b003b6b83fb0cd470e9ec25aebed81920127e1f16a892e298d3bf5d87b"
+    }
+  ]
+}
