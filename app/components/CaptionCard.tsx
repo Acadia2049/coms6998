@@ -23,19 +23,23 @@ export default function CaptionCard({
     isTop,
 }: CaptionCardProps) {
     const rank = index + 1;
+    const medium = text.length <= 86
+        ? "sticker"
+        : text.length <= 180
+            ? "stencil"
+            : "wheatpaste";
 
     return (
         <article
-            className={`rule-notice notice-variant-${(index % 3) + 1}`}
+            className={`rule-notice wall-note wall-${medium} wall-position-${(index % 6) + 1}`}
             data-caption-id={id}
+            id={`notice-${id}`}
         >
             <header className="rule-notice-header">
-                <span>Anonymous warning</span>
-                <span>#{String(rank).padStart(2, "0")}</span>
+                <span>Rule {String(rank).padStart(2, "0")}</span>
+                {isTop && <span className="leading-rule">Most confirmed</span>}
             </header>
-            {isTop && <span className="leading-rule">Most confirmed tonight</span>}
             <p className="rule-copy">{text}</p>
-            <p className="ai-disclosure">Community submission · AI helped edit the wording</p>
             <footer className="rule-notice-footer">
                 <div className="rule-card-actions">
                     {canVote ? (

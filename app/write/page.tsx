@@ -7,6 +7,7 @@ import SubmissionComposer from "@/app/components/SubmissionComposer";
 import { extractSeedFromGenerationPrompt, getTonightChallenge } from "@/lib/challenges";
 import { getSceneVisual } from "@/lib/scene-visuals";
 import { createClient } from "@/lib/supabase/server";
+import { getUserFirstName } from "@/lib/user-name";
 
 export const dynamic = "force-dynamic";
 
@@ -55,15 +56,18 @@ export default async function WritePage() {
 
     return (
         <div className="notice-site write-site found-write-site">
-            <SiteHeader isAuthenticated={Boolean(user)} currentPage="write" />
+            <SiteHeader
+                isAuthenticated={Boolean(user)}
+                currentPage="write"
+                accountName={user ? getUserFirstName(user) : undefined}
+            />
 
             <main className="found-writing-main">
                 <article className="supplemental-file">
-                    <span className="supplemental-tab">SUPPLEMENTAL RECORD · {challenge.date.replaceAll("-", ".")}</span>
+                    <span className="supplemental-tab">TONIGHT · {challenge.date.replaceAll("-", ".")}</span>
 
                     <header className="supplemental-heading">
                         <div>
-                            <span>NYC AFTER DARK / PUBLIC SUBMISSION DESK</span>
                             <h1>Add a warning to tonight&apos;s file</h1>
                         </div>
                         <p>{challenge.prompt}</p>
@@ -93,14 +97,10 @@ export default async function WritePage() {
                         <Link href="/#tonights-wall">Return to Tonight&apos;s Wall</Link>
                     </section>
 
-                    <section className="found-writing-workspace" aria-labelledby="warning-form-title">
-                        <header className="warning-form-heading">
-                            <div>
-                                <span>Entry form / private until published</span>
-                                <h2 id="warning-form-title">Supplemental warning</h2>
-                            </div>
-                            <p>Submit one instruction. You approve the final wording before it joins the public file.</p>
-                        </header>
+                    <section className="found-writing-workspace" aria-label="Warning entry form">
+                        <p className="warning-form-note">
+                            Private until published. You approve the final wording before it joins the wall.
+                        </p>
                         <SubmissionComposer
                             initialDraft={initialDraft}
                             isAuthenticated={Boolean(user)}
@@ -109,10 +109,6 @@ export default async function WritePage() {
                         />
                     </section>
 
-                    <footer className="supplemental-footer">
-                        <span>SUBMISSIONS ARE PRIVATE UNTIL PUBLISHED</span>
-                        <span>HUMAN SOURCE / AI-ASSISTED EDIT</span>
-                    </footer>
                 </article>
             </main>
 

@@ -2,6 +2,7 @@ import SiteFooter from "@/app/components/SiteFooter";
 import SiteHeader from "@/app/components/SiteHeader";
 import { getRecentPastChallenges } from "@/lib/challenges";
 import { createClient } from "@/lib/supabase/server";
+import { getUserFirstName } from "@/lib/user-name";
 
 export const dynamic = "force-dynamic";
 
@@ -35,7 +36,11 @@ export default async function PastNightsPage() {
 
     return (
         <div className="notice-site archive-site">
-            <SiteHeader isAuthenticated={Boolean(user)} currentPage="archive" />
+            <SiteHeader
+                isAuthenticated={Boolean(user)}
+                currentPage="archive"
+                accountName={user ? getUserFirstName(user) : undefined}
+            />
 
             <main className="archive-main">
                 <header className="archive-hero">

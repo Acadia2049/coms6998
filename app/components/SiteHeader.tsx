@@ -6,11 +6,13 @@ import SignOutButton from "./SignOutButton";
 type SiteHeaderProps = {
     isAuthenticated: boolean;
     currentPage: "tonight" | "archive" | "write";
+    accountName?: string;
 };
 
 export default function SiteHeader({
     isAuthenticated,
     currentPage,
+    accountName,
 }: SiteHeaderProps) {
     return (
         <>
@@ -45,7 +47,9 @@ export default function SiteHeader({
                 <div className="site-account">
                     {isAuthenticated ? (
                         <>
-                            <Link className="account-link" href="/profile">Account</Link>
+                            <Link className="account-link" href="/profile">
+                                {accountName || "Account"}
+                            </Link>
                             <SignOutButton />
                         </>
                     ) : (

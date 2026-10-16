@@ -3,6 +3,7 @@ import Link from "next/link";
 import GoogleSignInButton from "@/app/components/GoogleSignInButton";
 import SignOutButton from "@/app/components/SignOutButton";
 import { createClient } from "@/lib/supabase/server";
+import { getUserDisplayName } from "@/lib/user-name";
 
 export default async function DashboardPage() {
     const supabase = await createClient();
@@ -49,7 +50,7 @@ export default async function DashboardPage() {
 
     const displayName = profile?.first_name
         ? `${profile.first_name} ${profile.last_name ?? ""}`.trim()
-        : user.email;
+        : getUserDisplayName(user);
     return (
         <main className="page-container">
             <section className="dashboard-card">

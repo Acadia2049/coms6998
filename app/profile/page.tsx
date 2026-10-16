@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import ProfileForm from "@/app/components/ProfileForm";
 import ProfilePhotoUpload from "@/app/components/ProfilePhotoUpload";
 import { createClient } from "@/lib/supabase/server";
+import { getUserNameParts } from "@/lib/user-name";
 
 export default async function ProfilePage() {
     const supabase = await createClient();
@@ -37,6 +38,8 @@ export default async function ProfilePage() {
         );
     }
 
+    const inferredName = getUserNameParts(user);
+
     return (
         <main className="page-container">
             <h1>Profile</h1>
@@ -50,8 +53,8 @@ export default async function ProfilePage() {
 
             <ProfileForm
                 userId={user.id}
-                initialFirstName={profile?.first_name ?? null}
-                initialLastName={profile?.last_name ?? null}
+                initialFirstName={profile?.first_name || inferredName.firstName || null}
+                initialLastName={profile?.last_name || inferredName.lastName || null}
             />
 
             <p>

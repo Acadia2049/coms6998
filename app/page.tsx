@@ -14,6 +14,7 @@ import {
 } from "@/lib/challenges";
 import { getSceneVisual } from "@/lib/scene-visuals";
 import { createClient } from "@/lib/supabase/server";
+import { getUserFirstName } from "@/lib/user-name";
 
 export const dynamic = "force-dynamic";
 
@@ -91,64 +92,51 @@ export default async function Home({ searchParams }: HomePageProps) {
     const warningCount = captions?.length ?? 0;
 
     return (
-        <div className="notice-site home-site found-archive">
-            <SiteHeader isAuthenticated={Boolean(user)} currentPage="tonight" />
+        <div className="notice-site home-site living-wall-site">
+            <SiteHeader
+                isAuthenticated={Boolean(user)}
+                currentPage="tonight"
+                accountName={user ? getUserFirstName(user) : undefined}
+            />
 
-            <main className="found-archive-main">
-                <section className="archive-dossier" aria-labelledby="incident-title">
-                    <span className="dossier-tab">OPEN CASE · {challenge.date.replaceAll("-", ".")}</span>
-
-                    <header className="dossier-header">
-                        <div>
-                            <span>NYC AFTER DARK / COMMUNITY INCIDENT FILE</span>
-                            <strong>RECORD {challenge.id.toUpperCase()}</strong>
-                        </div>
-                        <dl>
-                            <div>
-                                <dt>Status</dt>
-                                <dd className="tampered-status">
-                                    <span aria-hidden="true">Closed</span>
-                                    <strong>Unresolved</strong>
-                                </dd>
+            <main className="living-wall-main">
+                <div className="living-wall">
+                    <section className="wall-incident" aria-labelledby="incident-title">
+                        <article className="incident-poster">
+                            <div className="poster-brow">
+                                <span>Tonight</span>
+                                <time dateTime={challenge.date}>{formattedDate}</time>
                             </div>
-                            <div><dt>Received</dt><dd>{challenge.time}</dd></div>
-                        </dl>
-                    </header>
-
-                    <div className="dossier-body">
-                        <div className="dossier-copy">
-                            <p className="dossier-date">{formattedDate}</p>
-                            <p className="dossier-section-label">Incident report</p>
                             <h1
-                                className={isLongTitle ? "dossier-title dossier-title-long" : "dossier-title"}
+                                className={isLongTitle ? "poster-title poster-title-long" : "poster-title"}
                                 id="incident-title"
                             >
                                 {challenge.location}
                             </h1>
                             <blockquote>{challenge.incident}</blockquote>
-                            <p className="dossier-handnote" aria-label="Archivist note">
+                            <p className="poster-handnote" aria-label="Anonymous note">
                                 {visual.marginNote}
                             </p>
-
-                            <div className="dossier-actions" aria-label="Tonight's incident actions">
-                                <Link className="dossier-action-primary" href="#tonights-wall">
-                                    Read Warnings
-                                </Link>
-                                <Link className="dossier-action-secondary" href="/write">
-                                    Write a Rule
-                                </Link>
+                            <div className="poster-actions" aria-label="Tonight's incident actions">
+                                <Link href="#tonights-wall">Read warnings</Link>
+                                <Link href="/write">Write a rule</Link>
                             </div>
-                        </div>
+                            <span className="poster-tear poster-tear-one" aria-hidden="true" />
+                            <span className="poster-tear poster-tear-two" aria-hidden="true" />
+                        </article>
 
-                        <figure className="dossier-photo">
-                            <div className="dossier-photo-frame">
+                        <figure className="wall-photo">
+                            <div
+                                className="wall-photo-frame"
+                                style={{ position: "relative", aspectRatio: "4 / 3" }}
+                            >
                                 <Image
                                     className="incident-photo"
                                     src={visual.image}
                                     alt={visual.imageAlt}
                                     fill
                                     priority
-                                    sizes="(max-width: 760px) 92vw, 39vw"
+                                    sizes="(max-width: 760px) 92vw, 42vw"
                                     style={{
                                         objectPosition: visual.imagePosition,
                                         "--mobile-object-position": visual.mobileImagePosition,
@@ -156,8 +144,8 @@ export default async function Home({ searchParams }: HomePageProps) {
                                 />
                             </div>
                             <figcaption>
-                                <span>FIELD IMAGE / {visual.routeLabel}</span>
-                                <span>FILED {challenge.time}</span>
+                                <span>{visual.routeLabel}</span>
+                                <span>{challenge.time}</span>
                             </figcaption>
                             <EvidenceNote
                                 detail={visual.folioDetail}
@@ -166,25 +154,15 @@ export default async function Home({ searchParams }: HomePageProps) {
                                 variant={visual.folioVariant}
                             />
                         </figure>
-                    </div>
+                    </section>
 
-                    <footer className="dossier-footer">
-                        <span>PUBLIC COPY · ANONYMOUSLY MAINTAINED</span>
-                        <span>REPORT REMAINS OPEN UNTIL NYC MIDNIGHT</span>
-                    </footer>
-                </section>
-
-                <section className="tonight-wall archive-addenda" id="tonights-wall" aria-labelledby="wall-title">
+                    <section className="tonight-wall wall-community" id="tonights-wall" aria-labelledby="wall-title">
                     <ScrollReveal>
-                        <header className="addenda-heading">
-                            <div>
-                                <span>Warnings left by anonymous New Yorkers</span>
-                                <h2 id="wall-title">Tonight&apos;s Wall</h2>
-                                <p>Warnings added to tonight&apos;s open incident file.</p>
-                            </div>
-                            <p className="addenda-count" aria-label={`${warningCount} warnings posted`}>
+                        <header className="wall-heading">
+                            <h2 id="wall-title">Tonight&apos;s <span>Wall</span></h2>
+                            <p className="wall-warning-count" aria-label={`${warningCount} warnings posted`}>
                                 <strong>{String(warningCount).padStart(2, "0")}</strong>
-                                <span>Warnings posted</span>
+                                <span>{warningCount === 1 ? "warning" : "warnings"}</span>
                             </p>
                         </header>
 
@@ -215,7 +193,8 @@ export default async function Home({ searchParams }: HomePageProps) {
                             </div>
                         )}
                     </ScrollReveal>
-                </section>
+                    </section>
+                </div>
             </main>
 
             <SiteFooter />

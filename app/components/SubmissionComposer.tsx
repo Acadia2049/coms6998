@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 import { createClient } from "@/lib/supabase/client";
@@ -42,9 +41,7 @@ export default function SubmissionComposer({
     const [errorMessage, setErrorMessage] = useState("");
     const [isGenerating, setIsGenerating] = useState(false);
     const [isPublishing, setIsPublishing] = useState(false);
-    const [publishedCaptionId, setPublishedCaptionId] = useState<number | null>(null);
     const [isRevealingDraft, setIsRevealingDraft] = useState(false);
-    const [isPasting, setIsPasting] = useState(false);
 
     useEffect(() => {
         if (initialDraft) {
@@ -69,29 +66,9 @@ export default function SubmissionComposer({
         window.sessionStorage.setItem(SAVED_SEED_KEY, value);
     }
 
-    function focusPublishedSubmission(captionId: number, attempt = 0) {
-        window.setTimeout(() => {
-            const card = document.querySelector<HTMLElement>(
-                `[data-caption-id="${captionId}"]`
-            );
-
-            if (card) {
-                card.classList.add("just-published");
-                card.scrollIntoView({ behavior: "smooth", block: "center" });
-                window.setTimeout(() => card.classList.remove("just-published"), 3200);
-                return;
-            }
-
-            if (attempt < 16) {
-                focusPublishedSubmission(captionId, attempt + 1);
-            }
-        }, attempt === 0 ? 180 : 120);
-    }
-
     async function generateResponse(draftId?: number) {
         setIsGenerating(true);
         setErrorMessage("");
-        setPublishedCaptionId(null);
 
         try {
             if (!isAuthenticated) {
@@ -159,15 +136,12 @@ export default function SubmissionComposer({
             }
 
             const publishedId = draft.id;
-            setIsPasting(true);
-            setPublishedCaptionId(publishedId);
             setDraft(null);
             setDraftText("");
             setSeed("");
             window.sessionStorage.removeItem(SAVED_SEED_KEY);
-            router.refresh();
-            focusPublishedSubmission(publishedId);
-            window.setTimeout(() => setIsPasting(false), 300);
+            const wallPath = returnToWallHref.split("#")[0] || "/";
+            router.push(`${wallPath}#notice-${publishedId}`);
         } catch (error) {
             setErrorMessage(
                 error instanceof Error ? error.message : "Could not publish this rule."
@@ -184,31 +158,18 @@ export default function SubmissionComposer({
 
     return (
         <section
-            className={`creation-zone${isPasting ? " is-pasting" : ""}${showIntro ? "" : " no-composer-intro"}`}
+            className={`creation-zone${showIntro ? "" : " no-composer-intro"}`}
             aria-labelledby="composer-title"
         >
             <ol className="composer-progress" aria-label="Creation progress">
-                <li className={!draft && !publishedCaptionId ? "is-current" : "is-complete"}>
+                <li className={!draft ? "is-current" : "is-complete"}>
                     Write
                 </li>
-                <li className={draft ? "is-current" : publishedCaptionId ? "is-complete" : ""}>
+                <li className={draft && !isPublishing ? "is-current" : draft ? "is-complete" : ""}>
                     Draft
                 </li>
-                <li className={publishedCaptionId ? "is-current" : ""}>Publish</li>
+                <li className={isPublishing ? "is-current" : ""}>Publish</li>
             </ol>
-
-            {publishedCaptionId && (
-                <div className="publish-confirmation" role="status">
-                    <span className="publish-stamp" aria-hidden="true">POSTED</span>
-                    <div>
-                        <strong>Notice #{String(publishedCaptionId).padStart(3, "0")} is live.</strong>
-                        <p>It has been pasted onto Tonight&apos;s Wall and is ready for canon votes.</p>
-                        <Link className="published-wall-link" href={returnToWallHref}>
-                            Return to Tonight&apos;s Wall
-                        </Link>
-                    </div>
-                </div>
-            )}
 
             <div className="composer" id="submission-composer">
                 {!draft ? (
@@ -248,7 +209,6 @@ export default function SubmissionComposer({
                                 ))}
                             </div>
                             <div className="seed-input-footer">
-                                <span>{isAuthenticated ? "Private until you publish" : "Sign in required to generate"}</span>
                                 <span id="rule-seed-count">{seed.length} / {MAX_SEED_LENGTH}</span>
                             </div>
                             <button
@@ -261,12 +221,6 @@ export default function SubmissionComposer({
                                     ? (isAuthenticated ? "WRITING THE NOTICE..." : "OPENING GOOGLE SIGN-IN...")
                                     : (isAuthenticated ? "GENERATE PRIVATE NOTICE" : "SIGN IN TO CREATE")}
                             </button>
-                            {!isAuthenticated && (
-                                <small className="guest-note">
-                                    Your seed stays in this browser while Google sign-in completes.
-                                    Browsing and voting totals remain public.
-                                </small>
-                            )}
                         </div>
                     </>
                 ) : (
@@ -278,10 +232,7 @@ export default function SubmissionComposer({
                             </div>
                             <span className="draft-number">NO. {String(draft.id).padStart(3, "0")}</span>
                         </div>
-                        <div className="saved-draft-label">
-                            <span aria-hidden="true">●</span> PRIVATE DRAFT / SAVED TO YOUR ACCOUNT
-                        </div>
-                        <label htmlFor="draft-response">Notice copy — edit directly on the paper</label>
+                        <label className="sr-only" htmlFor="draft-response">Edit the draft text</label>
                         <textarea
                             id="draft-response"
                             className="draft-response"
@@ -311,9 +262,6 @@ export default function SubmissionComposer({
                                 {isPublishing ? "PASTING TO THE WALL..." : "PUBLISH NOTICE"}
                             </button>
                         </div>
-                        <p className="draft-lock-note">
-                            Publishing is final for this notice. Published notices cannot be regenerated.
-                        </p>
                     </div>
                 )}
 
