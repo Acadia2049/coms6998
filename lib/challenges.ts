@@ -18,13 +18,14 @@ export type DailyChallenge = NightScene & {
 
 const NYC_TIME_ZONE = "America/New_York";
 const DAY_IN_MS = 24 * 60 * 60 * 1000;
-const ROTATION_ANCHOR_DAY_NUMBER = Math.floor(Date.UTC(2026, 9, 13) / DAY_IN_MS);
+const LEGACY_ROTATION_ANCHOR_DAY_NUMBER = Math.floor(Date.UTC(2026, 9, 13) / DAY_IN_MS);
+const ROTATION_ANCHOR_DAY_NUMBER = Math.floor(Date.UTC(2026, 9, 16) / DAY_IN_MS);
 
 /**
  * The order is intentional: October 13, 2026 starts at index 0, so the
  * following night (Wednesday, October 14) is the Butler Library scene.
  */
-export const NIGHT_SCENES: readonly NightScene[] = [
+const LEGACY_NIGHT_SCENES: readonly NightScene[] = [
     {
         id: "14th-street-empty-train",
         location: "14th Street Station",
@@ -138,6 +139,141 @@ export const NIGHT_SCENES: readonly NightScene[] = [
     },
 ];
 
+/**
+ * The current rotation begins on October 16, 2026. Dates after the final
+ * scheduled night continue by cycling through this list in the same order.
+ */
+export const NIGHT_SCENES: readonly NightScene[] = [
+    {
+        id: "met-temple-dendur-reflections",
+        location: "The Met — Temple of Dendur",
+        time: "12:18 AM",
+        incident:
+            "The museum is empty, but the reflecting pool shows visitors still wandering inside. One of them has just noticed the security guard watching.",
+        prompt: "What is one rule the night staff must follow?",
+    },
+    {
+        id: "broadway-playbill-understudies",
+        location: "Broadway Theater",
+        time: "10:47 PM",
+        incident:
+            "During intermission, several audience members discover their names printed in the Playbill as understudies. The ushers have begun calling them backstage.",
+        prompt: "What is one rule audience members must follow before the final curtain?",
+    },
+    {
+        id: "empire-state-double-tower",
+        location: "Empire State Building",
+        time: "1:08 AM",
+        incident:
+            "Visitors on the observation deck spot an identical Empire State Building across the skyline. Through the binoculars, they can see themselves waving from the other tower.",
+        prompt: "What is one rule visitors must follow before leaving?",
+    },
+    {
+        id: "grand-central-yesterday-train",
+        location: "Grand Central Terminal",
+        time: "12:26 AM",
+        incident:
+            "The departure board announces a train arriving yesterday. Several passengers recognize their own names on its reservation list.",
+        prompt: "What is one rule passengers must follow when the train arrives?",
+    },
+    {
+        id: "nypl-tomorrow-returns",
+        location: "New York Public Library",
+        time: "2:14 AM",
+        incident:
+            "Books are appearing in the return slot with tomorrow's date. Each contains a photograph of the person who opens it.",
+        prompt: "What is one rule visitors must follow before returning a book?",
+    },
+    {
+        id: "central-park-bow-bridge-reflection",
+        location: "Central Park — Bow Bridge",
+        time: "12:00 AM",
+        incident:
+            "At midnight, everyone crossing the bridge sees their reflection walking in the opposite direction. One reflection refuses to move.",
+        prompt: "What is one rule pedestrians must follow when crossing?",
+    },
+    {
+        id: "nyc-311-unclaimed-resident",
+        location: "NYC 311 Hotline",
+        time: "1:11 AM",
+        incident:
+            "The city's 311 hotline introduces a new complaint category: UNCLAIMED RESIDENT. Callers selecting it hear someone unlocking their apartment door.",
+        prompt: "What is one rule callers must follow before hanging up?",
+    },
+    {
+        id: "brooklyn-bridge-split-path",
+        location: "Brooklyn Bridge",
+        time: "2:03 AM",
+        incident:
+            "Halfway across the bridge, the walkway splits into two identical paths. Both signs point toward Manhattan, but only one appears on Google Maps.",
+        prompt: "What is one rule pedestrians must follow when choosing a path?",
+    },
+    {
+        id: "flushing-karaoke-fifth-voice",
+        location: "Flushing Karaoke",
+        time: "1:50 AM",
+        incident:
+            "Four friends are singing, but the microphones pick up a fifth voice. It sings every lyric exactly ten seconds before it appears on screen.",
+        prompt: "What is one rule the group must follow until the song ends?",
+    },
+    {
+        id: "roosevelt-island-tram-third-station",
+        location: "Roosevelt Island Tram",
+        time: "12:58 AM",
+        incident:
+            "The tram stops above the East River and announces an unfamiliar third station. Several passengers insist they boarded there.",
+        prompt: "What is one rule passengers must follow before the doors open?",
+    },
+    {
+        id: "soho-apartment-same-room",
+        location: "SoHo Apartment Viewing",
+        time: "11:31 PM",
+        incident:
+            "During an apartment tour, every door opens into the same room. The realtor keeps crossing names off the visitor list before those people arrive.",
+        prompt: "What is one rule prospective tenants must follow?",
+    },
+    {
+        id: "manhattan-blackout-lit-windows",
+        location: "Manhattan Blackout",
+        time: "12:07 AM",
+        incident:
+            "During a citywide blackout, apartment windows begin lighting up one by one. Every illuminated window contains the same unfamiliar person.",
+        prompt: "What is one rule residents must follow when their window lights up?",
+    },
+    {
+        id: "rockefeller-center-future-skaters",
+        location: "Rockefeller Center",
+        time: "1:25 AM",
+        incident:
+            "The ice rink is empty, but fresh skate marks keep appearing across the ice. Security cameras show a crowd skating there five minutes in the future.",
+        prompt: "What is one rule security guards must follow before the crowd arrives?",
+    },
+    {
+        id: "rockaway-beach-buried-platform",
+        location: "Rockaway Beach",
+        time: "3:09 AM",
+        incident:
+            "The retreating tide reveals a subway platform buried beneath the sand. Its arrival board lists the last place each onlooker called home.",
+        prompt: "What is one rule beachgoers must follow when the train approaches?",
+    },
+    {
+        id: "east-village-costume-shop-tomorrow",
+        location: "East Village Costume Shop",
+        time: "11:46 PM",
+        incident:
+            "Every Halloween costume in the store has a customer's name attached. The register claims each costume has already been worn tomorrow.",
+        prompt: "What is one rule shoppers must follow before trying one on?",
+    },
+    {
+        id: "village-halloween-parade-silent-group",
+        location: "Village Halloween Parade",
+        time: "12:31 AM",
+        incident:
+            "A silent group joins the Halloween parade, dressed as ordinary spectators. Anyone who watches them soon spots themselves walking among the performers.",
+        prompt: "What is one rule spectators must follow when the silent group approaches?",
+    },
+];
+
 function getNewYorkDateParts(date: Date) {
     const parts = new Intl.DateTimeFormat("en-US", {
         timeZone: NYC_TIME_ZONE,
@@ -158,12 +294,16 @@ function getNewYorkDateParts(date: Date) {
 
 function getChallengeForDateParts(year: number, month: number, day: number): DailyChallenge {
     const dayNumber = Math.floor(Date.UTC(year, month - 1, day) / DAY_IN_MS);
-    const daysSinceAnchor = dayNumber - ROTATION_ANCHOR_DAY_NUMBER;
+    const isLegacyDate = dayNumber < ROTATION_ANCHOR_DAY_NUMBER;
+    const scenes = isLegacyDate ? LEGACY_NIGHT_SCENES : NIGHT_SCENES;
+    const anchorDayNumber = isLegacyDate
+        ? LEGACY_ROTATION_ANCHOR_DAY_NUMBER
+        : ROTATION_ANCHOR_DAY_NUMBER;
+    const daysSinceAnchor = dayNumber - anchorDayNumber;
     const sceneIndex =
-        ((daysSinceAnchor % NIGHT_SCENES.length) + NIGHT_SCENES.length) %
-        NIGHT_SCENES.length;
+        ((daysSinceAnchor % scenes.length) + scenes.length) % scenes.length;
     const date = `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
-    const scene = NIGHT_SCENES[sceneIndex];
+    const scene = scenes[sceneIndex];
 
     return {
         ...scene,
@@ -193,7 +333,9 @@ export function getRecentPastChallenges(count: number, now = new Date()) {
 }
 
 export function getNightSceneById(id: string) {
-    return NIGHT_SCENES.find((scene) => scene.id === id) ?? null;
+    return NIGHT_SCENES.find((scene) => scene.id === id)
+        ?? LEGACY_NIGHT_SCENES.find((scene) => scene.id === id)
+        ?? null;
 }
 
 const HUMAN_SEED_PREFIX = "HUMAN_SEED_JSON: ";

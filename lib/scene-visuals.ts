@@ -25,6 +25,42 @@ const DEFAULT_SCENE_VISUAL: SceneVisual = {
 };
 
 const SCENE_VISUALS: Record<string, SceneVisual> = {
+    "met-temple-dendur-reflections": {
+        image: "/images/incidents/met-temple-dendur.webp",
+        imageAlt: "The empty Temple of Dendur gallery at night with visitors visible only in the reflecting pool",
+        imagePosition: "center 62%",
+        mobileImagePosition: "58% center",
+        routeLabel: "UPPER EAST SIDE / GALLERY 131",
+        folioTitle: "NIGHT WATCH LOG",
+        folioDetail: "GALLERY EMPTY · POOL OCCUPIED",
+        folioVariant: "record",
+        marginNote: "the pool count is higher than the door count",
+        hiddenNote: "One reflection turned before the guard moved.",
+    },
+    "broadway-playbill-understudies": {
+        image: "/images/incidents/broadway-theater.webp",
+        imageAlt: "A Broadway theater during intermission as audience members inspect their programs",
+        imagePosition: "center 58%",
+        mobileImagePosition: "62% center",
+        routeLabel: "BROADWAY / HOUSE LEFT",
+        folioTitle: "PLAYBILL INSERT",
+        folioDetail: "INTERMISSION · CAST LIST CHANGED",
+        folioVariant: "ticket",
+        marginNote: "no understudies were listed at curtain up",
+        hiddenNote: "The backstage call used names not printed on any ticket.",
+    },
+    "empire-state-double-tower": {
+        image: "/images/incidents/empire-state-building.webp",
+        imageAlt: "A nighttime observation deck overlooking an impossible second Empire State Building",
+        imagePosition: "center center",
+        mobileImagePosition: "58% center",
+        routeLabel: "MIDTOWN / 86TH FLOOR",
+        folioTitle: "OBSERVATION LOG",
+        folioDetail: "SECOND TOWER · UNMAPPED",
+        folioVariant: "service",
+        marginNote: "they waved before anyone raised a hand",
+        hiddenNote: "The binocular counter recorded two observation decks.",
+    },
     "14th-street-empty-train": {
         image: "/images/incidents/14th-street-station.webp",
         imageAlt: "An empty subway train waiting at a late-night Manhattan platform",

@@ -1,15 +1,22 @@
 # Incident photography
 
-These five 1536 × 1024 WebP images were generated for the NYC After Dark
-Midnight Collage redesign with OpenAI's built-in image generation tool on
-October 15, 2026. They are project-local original assets and do not reproduce
+These project-local WebP images were generated for NYC After Dark with
+OpenAI's built-in image generation tool. The original Midnight Collage set was
+created on October 15, 2026; the first three images for the October 16–31
+challenge rotation were created on October 16, 2026. They do not reproduce
 photographs from third-party websites.
 
 | File | Intended scene family |
 | --- | --- |
+| `met-temple-dendur.webp` | October 16 — The Met, Temple of Dendur |
+| `broadway-theater.webp` | October 17 — Broadway Theater |
+| `empire-state-building.webp` | October 18 — Empire State Building |
 | `staten-island-ferry.webp` | Harbor, ferry, tram, and waterfront incidents |
 | `butler-library.webp` | Butler Library and late-night institutional interiors |
 | `14th-street-station.webp` | Subway, tunnel, and rail incidents |
+| `washington-square-park.webp` | Washington Square Park incidents |
+| `chinatown-laundromat.webp` | Laundromat incidents |
+| `riverside-park-tunnel.webp` | Riverside Park tunnel incidents |
 | `nyc-night-street.webp` | General street, storefront, park, bus, and default incidents |
 | `brooklyn-stairwell.webp` | Apartment and residential-access incidents |
 
