@@ -10,12 +10,14 @@ type ProfileFormProps = {
     userId: string;
     initialFirstName: string | null;
     initialLastName: string | null;
+    isReadOnly?: boolean;
 };
 
 export default function ProfileForm({
                                         userId,
                                         initialFirstName,
                                         initialLastName,
+                                        isReadOnly = false,
                                     }: ProfileFormProps) {
     const router = useRouter();
 
@@ -27,6 +29,10 @@ export default function ProfileForm({
 
     async function handleSubmit(event: FormEvent<HTMLFormElement>) {
         event.preventDefault();
+
+        if (isReadOnly) {
+            return;
+        }
 
         const trimmedFirstName = firstName.trim();
         const trimmedLastName = lastName.trim();
@@ -65,22 +71,26 @@ export default function ProfileForm({
 
     return (
         <form className="profile-form" onSubmit={handleSubmit}>
-            <div className="profile-field">
+            <div className="profile-field profile-field-numbered">
+                <span aria-hidden="true">01</span>
                 <label htmlFor="profile-first-name">First name</label>
                 <input
                     id="profile-first-name"
                     type="text"
                     value={firstName}
+                    disabled={isReadOnly}
                     onChange={(event) => setFirstName(event.target.value)}
                 />
             </div>
 
-            <div className="profile-field">
+            <div className="profile-field profile-field-numbered">
+                <span aria-hidden="true">02</span>
                 <label htmlFor="profile-last-name">Last name</label>
                 <input
                     id="profile-last-name"
                     type="text"
                     value={lastName}
+                    disabled={isReadOnly}
                     onChange={(event) => setLastName(event.target.value)}
                 />
             </div>
@@ -96,9 +106,9 @@ export default function ProfileForm({
             <button
                 className="profile-save-button"
                 type="submit"
-                disabled={isSaving}
+                disabled={isSaving || isReadOnly}
             >
-                {isSaving ? "Saving..." : "Save changes"}
+                {isReadOnly ? "Preview only" : isSaving ? "Saving..." : "Save changes"}
             </button>
         </form>
     );

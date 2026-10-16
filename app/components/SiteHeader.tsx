@@ -5,7 +5,7 @@ import SignOutButton from "./SignOutButton";
 
 type SiteHeaderProps = {
     isAuthenticated: boolean;
-    currentPage: "tonight" | "archive" | "write";
+    currentPage: "tonight" | "archive" | "write" | "profile";
     accountName?: string;
 };
 
@@ -47,7 +47,11 @@ export default function SiteHeader({
                 <div className="site-account">
                     {isAuthenticated ? (
                         <>
-                            <Link className="account-link" href="/profile">
+                            <Link
+                                className="account-link"
+                                href="/profile"
+                                aria-current={currentPage === "profile" ? "page" : undefined}
+                            >
                                 {accountName || "Account"}
                             </Link>
                             <SignOutButton />

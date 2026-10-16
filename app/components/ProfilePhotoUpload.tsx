@@ -9,6 +9,8 @@ import { createClient } from "@/lib/supabase/client";
 type ProfilePhotoUploadProps = {
     userId: string;
     initialPhotoUrl: string | null;
+    initials: string;
+    isReadOnly?: boolean;
 };
 
 const MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024;
@@ -16,6 +18,8 @@ const MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024;
 export default function ProfilePhotoUpload({
                                                userId,
                                                initialPhotoUrl,
+                                               initials,
+                                               isReadOnly = false,
                                            }: ProfilePhotoUploadProps) {
     const router = useRouter();
 
@@ -30,6 +34,10 @@ export default function ProfilePhotoUpload({
         const file = event.target.files?.[0];
 
         if (!file) {
+            return;
+        }
+
+        if (isReadOnly) {
             return;
         }
 
@@ -105,8 +113,6 @@ export default function ProfilePhotoUpload({
 
     return (
         <section className="profile-photo-section">
-            <h2>Profile photo</h2>
-
             {photoUrl ? (
                 <img
                     className="profile-avatar"
@@ -116,16 +122,19 @@ export default function ProfilePhotoUpload({
                     height={160}
                 />
             ) : (
-                <p className="profile-photo-empty">
-                    No profile photo yet.
-                </p>
+                <div className="profile-avatar profile-avatar-empty" aria-label="No profile photo">
+                    <strong aria-hidden="true">{initials}</strong>
+                    <span>No image filed</span>
+                </div>
             )}
+
+            <p className="profile-photo-help">JPG, PNG or WebP · 5 MB maximum</p>
 
             <label
                 className="profile-photo-button"
                 htmlFor="profile-photo"
             >
-                {isUploading ? "Uploading..." : "Choose a photo"}
+                {isReadOnly ? "Preview only" : isUploading ? "Uploading..." : "Choose a photo"}
             </label>
 
             <input
@@ -133,7 +142,7 @@ export default function ProfilePhotoUpload({
                 className="profile-photo-input"
                 type="file"
                 accept="image/*"
-                disabled={isUploading}
+                disabled={isUploading || isReadOnly}
                 onChange={handleFileChange}
             />
 

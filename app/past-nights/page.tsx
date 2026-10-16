@@ -1,6 +1,10 @@
+import Image from "next/image";
+import type { CSSProperties } from "react";
+
 import SiteFooter from "@/app/components/SiteFooter";
 import SiteHeader from "@/app/components/SiteHeader";
 import { getRecentPastChallenges } from "@/lib/challenges";
+import { getSceneVisual } from "@/lib/scene-visuals";
 import { createClient } from "@/lib/supabase/server";
 import { getUserFirstName } from "@/lib/user-name";
 
@@ -33,41 +37,48 @@ export default async function PastNightsPage() {
         .order("published_at", { ascending: true });
 
     const archivedRules = (data ?? []) as ArchivedRule[];
+    const preservedCount = archivedRules.length;
 
     return (
-        <div className="notice-site archive-site">
+        <div className="notice-site living-wall-site archive-wall-site">
             <SiteHeader
                 isAuthenticated={Boolean(user)}
                 currentPage="archive"
                 accountName={user ? getUserFirstName(user) : undefined}
             />
 
-            <main className="archive-main">
-                <header className="archive-hero">
-                    <span className="section-index">CLOSED RECORDS / PREVIOUS 07 NIGHTS</span>
-                    <h1>Night archive</h1>
-                    <p>
-                        Each file closes at midnight. The three most confirmed notices remain;
-                        the highest-ranked instruction is marked primary.
-                    </p>
-                </header>
+            <main className="archive-wall-main">
+                <header className="archive-wall-hero">
+                    <div className="archive-title-poster">
+                        <span className="archive-eyebrow">Closed records / previous 07 nights</span>
+                        <h1>Past <em>Nights</em></h1>
+                        <p>
+                            The wall changes at midnight. What the city confirmed stays here:
+                            seven scenes, their surviving warnings, and the evidence left behind.
+                        </p>
+                        <span className="archive-scribble" aria-hidden="true">don&apos;t reorder these</span>
+                    </div>
 
-                <div className="archive-key" aria-label="Archive status">
-                    <span>RECORD WINDOW</span>
-                    <strong>07 NIGHTS</strong>
-                    <span>EDITING</span>
-                    <strong>CLOSED</strong>
-                    <span>ORDER</span>
-                    <strong>NEWEST FIRST</strong>
-                </div>
+                    <aside className="archive-tally" aria-label="Archive summary">
+                        <span>Wall inventory</span>
+                        <strong>07</strong>
+                        <small>NIGHTS FILED</small>
+                        <dl>
+                            <div><dt>Order</dt><dd>Newest first</dd></div>
+                            <div><dt>Status</dt><dd>Closed</dd></div>
+                            <div><dt>Notices</dt><dd>{String(preservedCount).padStart(2, "0")} preserved</dd></div>
+                        </dl>
+                    </aside>
+                </header>
 
                 {error ? (
                     <div className="wall-state wall-error">
                         The archive could not be opened. Try refreshing.
                     </div>
                 ) : (
-                    <div className="archive-list">
-                        {nights.map((night) => {
+                    <div className="archive-wall-grid">
+                        {nights.map((night, nightIndex) => {
+                            const visual = getSceneVisual(night.id);
                             const rules = archivedRules
                                 .filter(
                                     (rule) =>
@@ -85,42 +96,67 @@ export default async function PastNightsPage() {
                                 })
                                 .slice(0, 3);
                             const dateLabel = new Intl.DateTimeFormat("en-US", {
+                                weekday: "short",
                                 month: "short",
                                 day: "numeric",
                                 timeZone: "America/New_York",
-                            }).format(new Date(`${night.date}T12:00:00Z`));
+                            }).format(new Date(`${night.date}T12:00:00-04:00`));
 
                             return (
-                                <section className="archive-night" key={night.date}>
-                                    <header className="archive-night-heading">
-                                        <div>
-                                            <span>{dateLabel.toUpperCase()} · {night.time}</span>
+                                <article
+                                    className={`archive-wall-card archive-wall-card-${(nightIndex % 3) + 1}`}
+                                    key={night.date}
+                                >
+                                    <div className="archive-card-strip">
+                                        <span>FILE {String(nightIndex + 1).padStart(2, "0")}</span>
+                                        <time dateTime={night.date}>{dateLabel}</time>
+                                        <span>{night.time}</span>
+                                    </div>
+
+                                    <div className="archive-card-body">
+                                        <figure className="archive-card-photo">
+                                            <div className="archive-card-photo-frame">
+                                                <Image
+                                                    src={visual.image}
+                                                    alt={visual.imageAlt}
+                                                    fill
+                                                    sizes="(max-width: 760px) 88vw, 36vw"
+                                                    style={{
+                                                        objectFit: "cover",
+                                                        objectPosition: visual.imagePosition,
+                                                        "--mobile-object-position": visual.mobileImagePosition,
+                                                    } as CSSProperties}
+                                                />
+                                            </div>
+                                            <figcaption>{visual.routeLabel}</figcaption>
+                                        </figure>
+
+                                        <div className="archive-card-copy">
+                                            <span className="archive-card-status">
+                                                {String(rules.length).padStart(2, "0")} notices survived
+                                            </span>
                                             <h2>{night.location}</h2>
+                                            <p>{night.incident}</p>
                                         </div>
-                                        <strong>
-                                            {String(rules.length).padStart(2, "0")} PRESERVED
-                                        </strong>
-                                    </header>
+                                    </div>
 
                                     {rules.length ? (
-                                        <ol className="canon-list">
+                                        <ol className="archive-notice-list">
                                             {rules.map((rule, index) => (
-                                                <li className={index === 0 ? "primary-canon" : ""} key={rule.id}>
-                                                    <div className="canon-rank">
-                                                        <span>#{index + 1}</span>
-                                                        <small>{index === 0 ? "PRIMARY GUIDANCE" : "PRESERVED NOTICE"}</small>
-                                                    </div>
+                                                <li key={rule.id}>
+                                                    <span>{index === 0 ? "TOP" : `0${index + 1}`}</span>
                                                     <p>{rule.text}</p>
-                                                    <span className="canon-votes">{rule.vote_score} CONFIRMATIONS</span>
+                                                    <small>{rule.vote_score} confirmations</small>
                                                 </li>
                                             ))}
                                         </ol>
                                     ) : (
-                                        <div className="archive-empty-night">
-                                            RECORD INCOMPLETE / NO GUIDANCE WAS PRESERVED
+                                        <div className="archive-no-notices">
+                                            <span>No public warning survived this night.</span>
+                                            <small>Incident image retained / record closed</small>
                                         </div>
                                     )}
-                                </section>
+                                </article>
                             );
                         })}
                     </div>
