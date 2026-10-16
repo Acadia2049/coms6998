@@ -59,10 +59,6 @@ export default async function ProfilePage({ searchParams }: ProfilePageProps) {
                     <header className="profile-title-poster">
                         <span className="profile-kicker">Witness file / active contributor</span>
                         <h1 id="profile-title">Your night <em>profile</em></h1>
-                        <p>
-                            Keep the name and photograph attached to your warnings current.
-                            Your email remains private and is only used to identify your account.
-                        </p>
                         <dl>
                             <div><dt>Status</dt><dd>Verified</dd></div>
                             <div><dt>File</dt><dd>{userId.slice(0, 8).toUpperCase()}</dd></div>
@@ -83,7 +79,6 @@ export default async function ProfilePage({ searchParams }: ProfilePageProps) {
                     <section className="profile-details-sheet" aria-labelledby="identity-details-title">
                         <div className="profile-sheet-heading">
                             <span>Identification / editable</span>
-                            <small>NYC–AD · MEMBER RECORD</small>
                         </div>
                         <h2 id="identity-details-title">{displayName}</h2>
                         <div className="profile-email-row">
@@ -107,7 +102,7 @@ export default async function ProfilePage({ searchParams }: ProfilePageProps) {
                     </section>
 
                     <Link className="profile-back-link" href="/">
-                        ← Return to tonight&apos;s wall
+                        Return to tonight&apos;s wall
                     </Link>
                 </section>
             </main>

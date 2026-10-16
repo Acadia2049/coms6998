@@ -128,8 +128,6 @@ export default function ProfilePhotoUpload({
                 </div>
             )}
 
-            <p className="profile-photo-help">JPG, PNG or WebP · 5 MB maximum</p>
-
             <label
                 className="profile-photo-button"
                 htmlFor="profile-photo"

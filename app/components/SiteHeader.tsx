@@ -58,7 +58,7 @@ export default function SiteHeader({
                         </>
                     ) : (
                         <GoogleSignInButton
-                            label="Sign in"
+                            label="Continue with Google"
                             returnTo={currentPage === "write" ? "/write" : "/"}
                         />
                     )}

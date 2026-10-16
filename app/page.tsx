@@ -4,6 +4,7 @@ import type { CSSProperties } from "react";
 
 import CaptionCard from "@/app/components/CaptionCard";
 import EvidenceNote from "@/app/components/EvidenceNote";
+import GoogleSignInButton from "@/app/components/GoogleSignInButton";
 import ScrollReveal from "@/app/components/ScrollReveal";
 import SiteFooter from "@/app/components/SiteFooter";
 import SiteHeader from "@/app/components/SiteHeader";
@@ -155,6 +156,16 @@ export default async function Home({ searchParams }: HomePageProps) {
                             />
                         </figure>
                     </section>
+
+                    {!user && (
+                        <aside className="wall-sign-in-note" aria-label="Sign in to take part">
+                            <div>
+                                <span>Join tonight&apos;s wall</span>
+                                <p>Sign in to post a warning, vote, or change your vote.</p>
+                            </div>
+                            <GoogleSignInButton />
+                        </aside>
+                    )}
 
                     <section className="tonight-wall wall-community" id="tonights-wall" aria-labelledby="wall-title">
                     <ScrollReveal>

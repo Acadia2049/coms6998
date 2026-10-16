@@ -37,8 +37,6 @@ export default async function PastNightsPage() {
         .order("published_at", { ascending: true });
 
     const archivedRules = (data ?? []) as ArchivedRule[];
-    const preservedCount = archivedRules.length;
-
     return (
         <div className="notice-site living-wall-site archive-wall-site">
             <SiteHeader
@@ -50,25 +48,12 @@ export default async function PastNightsPage() {
             <main className="archive-wall-main">
                 <header className="archive-wall-hero">
                     <div className="archive-title-poster">
-                        <span className="archive-eyebrow">Closed records / previous 07 nights</span>
+                        <span className="archive-eyebrow">Previous 07 nights</span>
                         <h1>Past <em>Nights</em></h1>
                         <p>
-                            The wall changes at midnight. What the city confirmed stays here:
-                            seven scenes, their surviving warnings, and the evidence left behind.
+                            The last seven scenes, with the warnings people voted to keep.
                         </p>
-                        <span className="archive-scribble" aria-hidden="true">don&apos;t reorder these</span>
                     </div>
-
-                    <aside className="archive-tally" aria-label="Archive summary">
-                        <span>Wall inventory</span>
-                        <strong>07</strong>
-                        <small>NIGHTS FILED</small>
-                        <dl>
-                            <div><dt>Order</dt><dd>Newest first</dd></div>
-                            <div><dt>Status</dt><dd>Closed</dd></div>
-                            <div><dt>Notices</dt><dd>{String(preservedCount).padStart(2, "0")} preserved</dd></div>
-                        </dl>
-                    </aside>
                 </header>
 
                 {error ? (
@@ -146,14 +131,13 @@ export default async function PastNightsPage() {
                                                 <li key={rule.id}>
                                                     <span>{index === 0 ? "TOP" : `0${index + 1}`}</span>
                                                     <p>{rule.text}</p>
-                                                    <small>{rule.vote_score} confirmations</small>
+                                                    <small>{rule.vote_score} {rule.vote_score === 1 ? "vote" : "votes"}</small>
                                                 </li>
                                             ))}
                                         </ol>
                                     ) : (
                                         <div className="archive-no-notices">
                                             <span>No public warning survived this night.</span>
-                                            <small>Incident image retained / record closed</small>
                                         </div>
                                     )}
                                 </article>
