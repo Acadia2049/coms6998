@@ -23,15 +23,9 @@ export default function CaptionCard({
     isTop,
 }: CaptionCardProps) {
     const rank = index + 1;
-    const medium = text.length <= 86
-        ? "sticker"
-        : text.length <= 180
-            ? "stencil"
-            : "wheatpaste";
-
     return (
         <article
-            className={`rule-notice wall-note wall-${medium} wall-position-${(index % 6) + 1}`}
+            className={`rule-notice wall-note wall-stencil wall-position-${(index % 6) + 1}`}
             data-caption-id={id}
             id={`notice-${id}`}
         >
