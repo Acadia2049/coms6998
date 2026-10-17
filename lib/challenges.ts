@@ -145,12 +145,12 @@ const LEGACY_NIGHT_SCENES: readonly NightScene[] = [
  */
 export const NIGHT_SCENES: readonly NightScene[] = [
     {
-        id: "met-temple-dendur-reflections",
-        location: "The Met — Temple of Dendur",
-        time: "12:18 AM",
+        id: "washington-square-missing-arch",
+        location: "Washington Square Park",
+        time: "12:47 AM",
         incident:
-            "The museum is empty, but the reflecting pool shows visitors still wandering inside. One of them has just noticed the security guard watching.",
-        prompt: "What is one rule the night staff must follow?",
+            "The arch disappears whenever the fountain goes silent, and the exits no longer lead to the same streets.",
+        prompt: "What is one rule visitors must follow to leave the park?",
     },
     {
         id: "broadway-playbill-understudies",

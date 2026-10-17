@@ -57,7 +57,7 @@ export default async function ProfilePage({ searchParams }: ProfilePageProps) {
             <main className="profile-wall-main">
                 <section className="profile-wall" aria-labelledby="profile-title">
                     <header className="profile-title-poster">
-                        <span className="profile-kicker">Witness file / active contributor</span>
+                        <span className="profile-kicker">Witness file</span>
                         <h1 id="profile-title">Your night <em>profile</em></h1>
                         <dl>
                             <div><dt>Status</dt><dd>Verified</dd></div>
@@ -67,7 +67,6 @@ export default async function ProfilePage({ searchParams }: ProfilePageProps) {
                     </header>
 
                     <div className="profile-photo-wrap">
-                        <span className="profile-photo-label">CURRENT LIKENESS</span>
                         <ProfilePhotoUpload
                             userId={userId}
                             initialPhotoUrl={profile?.profile_photo_url ?? null}
@@ -78,7 +77,7 @@ export default async function ProfilePage({ searchParams }: ProfilePageProps) {
 
                     <section className="profile-details-sheet" aria-labelledby="identity-details-title">
                         <div className="profile-sheet-heading">
-                            <span>Identification / editable</span>
+                            <span>Identification</span>
                         </div>
                         <h2 id="identity-details-title">{displayName}</h2>
                         <div className="profile-email-row">

@@ -31,7 +31,7 @@ const SCENE_VISUALS: Record<string, SceneVisual> = {
         imagePosition: "center 62%",
         mobileImagePosition: "58% center",
         routeLabel: "UPPER EAST SIDE / GALLERY 131",
-        folioTitle: "NIGHT WATCH LOG",
+        folioTitle: "GALLERY RECORD",
         folioDetail: "GALLERY EMPTY · POOL OCCUPIED",
         folioVariant: "record",
         marginNote: "the pool count is higher than the door count",

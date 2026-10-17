@@ -161,7 +161,7 @@ export default async function Home({ searchParams }: HomePageProps) {
                         <aside className="wall-sign-in-note" aria-label="Sign in to take part">
                             <div>
                                 <span>Join tonight&apos;s wall</span>
-                                <p>Sign in to post a warning, vote, or change your vote.</p>
+                                <p>Sign in to post a warning or vote.</p>
                             </div>
                             <GoogleSignInButton />
                         </aside>

@@ -128,6 +128,16 @@ export default function ProfilePhotoUpload({
                 </div>
             )}
 
+            <div className="profile-photo-feedback" aria-live="polite">
+                {errorMessage && (
+                    <p className="profile-error">{errorMessage}</p>
+                )}
+
+                {successMessage && (
+                    <p className="profile-success">{successMessage}</p>
+                )}
+            </div>
+
             <label
                 className="profile-photo-button"
                 htmlFor="profile-photo"
@@ -143,14 +153,6 @@ export default function ProfilePhotoUpload({
                 disabled={isUploading || isReadOnly}
                 onChange={handleFileChange}
             />
-
-            {errorMessage && (
-                <p className="profile-error">{errorMessage}</p>
-            )}
-
-            {successMessage && (
-                <p className="profile-success">{successMessage}</p>
-            )}
         </section>
     );
 }
