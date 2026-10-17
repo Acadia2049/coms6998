@@ -2060,12 +2060,20 @@ body { background: var(--paper); color: var(--ink); }
 .wall-sign-in-note span {
   display: block;
   font-family: var(--font-geist-mono), monospace;
-  font-size: 10px;
+  font-size: 13px;
   font-weight: 900;
-  letter-spacing: .08em;
+  letter-spacing: .065em;
   text-transform: uppercase;
 }
-.wall-sign-in-note p { margin: 7px 0 0; color: #3d3f3b; font-size: 14px; line-height: 1.45; }
+.wall-sign-in-note p {
+  margin: 8px 0 0;
+  color: #2d302e;
+  font-family: var(--font-geist-sans), Arial, sans-serif;
+  font-size: 17px;
+  font-weight: 510;
+  letter-spacing: -.015em;
+  line-height: 1.42;
+}
 .living-wall-site .wall-sign-in-note .google-sign-in-button {
   flex: 0 0 auto;
   min-height: 50px;
@@ -2216,6 +2224,23 @@ body { background: var(--paper); color: var(--ink); }
 }
 .living-wall-site .wall-wheatpaste::after { position: absolute; top: -9px; left: 18%; width: 82px; height: 21px; background: rgba(207, 195, 157, .78); content: ""; transform: rotate(3deg); }
 
+.living-wall-site .rule-notice,
+.living-wall-site .rule-notice:first-child {
+  border: 2px solid var(--wall-pink);
+}
+.living-wall-site .rule-notice::before {
+  position: absolute;
+  top: -8px;
+  left: 24px;
+  width: 70px;
+  height: 12px;
+  background: var(--wall-pink);
+  content: "";
+}
+.living-wall-site .rule-notice-header { color: var(--wall-pink); }
+.living-wall-site .wall-sticker .rule-notice-header,
+.living-wall-site .wall-wheatpaste .rule-notice-header { color: var(--wall-pink-deep); }
+
 .living-wall-site .wall-position-1 { transform: rotate(-1.2deg); }
 .living-wall-site .wall-position-2 { margin-top: 54px; transform: rotate(1.1deg); }
 .living-wall-site .wall-position-3 { transform: rotate(.5deg); }
@@ -2319,17 +2344,28 @@ body { background: var(--paper); color: var(--ink); }
 
 /* ---------- Writing desk legibility pass ---------- */
 
-.found-write-site { --acid: #d8d6ce; --midnight-yellow: #d8d6ce; }
+.found-write-site {
+  --acid: #ff4f9a;
+  --midnight-yellow: #ff4f9a;
+  --archive-ground: #111516;
+  --archive-ground-dark: #0b0d0d;
+  --archive-paper: #eee8da;
+  --archive-paper-deep: #e4ded1;
+  --archive-paper-light: #f4efe5;
+  --archive-red: #b91f61;
+  --archive-yellow: #ff4f9a;
+}
+.found-write-site .supplemental-file { border-top: 7px solid #ff4f9a; }
 .found-write-site .found-writing-main { padding-top: clamp(42px, 4.5vw, 64px); }
 .found-write-site .supplemental-heading { padding-top: clamp(38px, 4.2vw, 58px); padding-bottom: 29px; }
 .found-write-site .supplemental-heading h1 { margin-top: 0; font-size: clamp(40px, 4.7vw, 64px); }
-.found-write-site .supplemental-heading > p { font-size: 16px; line-height: 1.55; }
+.found-write-site .supplemental-heading > p { padding-left: 18px; border-left: 5px solid #ff4f9a; font-size: 16px; line-height: 1.55; }
 .found-write-site .incident-reference { padding-top: 25px; padding-bottom: 25px; }
-.found-write-site .incident-reference-copy > span { font-size: 8px; }
+.found-write-site .incident-reference-photo { box-shadow: 8px 9px 0 rgba(255, 79, 154, .72); }
+.found-write-site .incident-reference-copy h2 { color: #171918; font-family: "Arial Narrow", "Helvetica Neue", Arial, sans-serif; font-weight: 900; text-transform: uppercase; }
 .found-write-site .incident-reference-copy > p { font-size: 14px; }
-.found-write-site .incident-reference-copy dt { font-size: 7px; }
-.found-write-site .incident-reference-copy dd { font-size: 9px; }
 .found-write-site .incident-reference > a { font-size: 9px; }
+.found-write-site .supplemental-tab { background: #ff4f9a; color: #171918; font-size: 11px; font-weight: 850; }
 
 .warning-form-note {
   max-width: 660px;
@@ -2366,7 +2402,7 @@ body { background: var(--paper); color: var(--ink); }
 .found-write-site.notice-site .generate-button:disabled { background: #353733; color: #f0ebe1; filter: none; opacity: .72; }
 .found-write-site .generate-button:hover,
 .found-write-site .publish-button:hover { background: #111311; color: #fff; }
-.found-write-site .regenerate-button { min-height: 51px; font-size: 10px; }
+.found-write-site .regenerate-button { min-height: 55px; font-size: 13px; }
 .found-write-site .draft-paper-header .step-stamp { font-size: 9px; }
 .found-write-site .draft-number { font-size: 9px; }
 .found-write-site .draft-meta { font-size: 9px; }
@@ -2379,7 +2415,8 @@ body { background: var(--paper); color: var(--ink); }
   .warning-form-note { margin-bottom: 24px; font-size: 14px; }
   .found-write-site .seed-help button { width: 100%; font-size: 14px; }
   .found-write-site .generate-button,
-  .found-write-site .publish-button { font-size: 11px; }
+  .found-write-site .publish-button,
+  .found-write-site .regenerate-button { font-size: 11px; }
 }
 
 /* ---------- Living wall: archive and profile ---------- */
@@ -2717,8 +2754,8 @@ body { background: var(--paper); color: var(--ink); }
 .profile-title-poster h1 { max-width: 720px; font-size: clamp(57px, 7vw, 98px); }
 .profile-title-poster dl { display: flex; gap: 36px; margin: 35px 0 0; padding-top: 18px; border-top: 1px solid #8f8b80; }
 .profile-title-poster dl div { display: grid; gap: 6px; }
-.profile-title-poster dt { color: #747168; font-size: 7px; letter-spacing: .09em; }
-.profile-title-poster dd { margin: 0; font-size: 9px; font-weight: 800; letter-spacing: .06em; }
+.profile-title-poster dt { color: #5f5d56; font-size: 10px; font-weight: 750; letter-spacing: .075em; }
+.profile-title-poster dd { margin: 0; font-size: 12px; font-weight: 850; letter-spacing: .055em; }
 
 .profile-photo-wrap {
   position: relative;

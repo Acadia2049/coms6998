@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 
 import SiteFooter from "@/app/components/SiteFooter";
 import SiteHeader from "@/app/components/SiteHeader";
@@ -24,6 +25,11 @@ export default async function WritePage() {
     const {
         data: { user },
     } = await supabase.auth.getUser();
+
+    if (!user) {
+        redirect("/#join-wall");
+    }
+
     let initialDraft: Draft | null = null;
 
     if (user) {
@@ -46,13 +52,6 @@ export default async function WritePage() {
             }
             : null;
     }
-
-    const formattedDate = new Intl.DateTimeFormat("en-US", {
-        month: "short",
-        day: "numeric",
-        year: "numeric",
-        timeZone: "America/New_York",
-    }).format(new Date(`${challenge.date}T12:00:00-04:00`));
 
     return (
         <div className="notice-site write-site found-write-site">
@@ -85,14 +84,8 @@ export default async function WritePage() {
                             />
                         </div>
                         <div className="incident-reference-copy">
-                            <span>Incident referenced · {formattedDate}</span>
                             <h2 id="writing-incident-title">{challenge.location}</h2>
                             <p>{challenge.incident}</p>
-                            <dl>
-                                <div><dt>Reported</dt><dd>{challenge.time}</dd></div>
-                                <div><dt>Status</dt><dd>Unresolved</dd></div>
-                                <div><dt>Route</dt><dd>{visual.routeLabel}</dd></div>
-                            </dl>
                         </div>
                         <Link href="/#tonights-wall">Return to Tonight&apos;s Wall</Link>
                     </section>
@@ -103,7 +96,7 @@ export default async function WritePage() {
                         </p>
                         <SubmissionComposer
                             initialDraft={initialDraft}
-                            isAuthenticated={Boolean(user)}
+                            isAuthenticated
                             returnToWallHref="/#tonights-wall"
                             showIntro={false}
                         />

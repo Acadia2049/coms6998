@@ -37,7 +37,7 @@ export default function SiteHeader({
                     </Link>
                     <Link
                         className="write-rule-link"
-                        href="/write"
+                        href={isAuthenticated ? "/write" : "/#join-wall"}
                         aria-current={currentPage === "write" ? "page" : undefined}
                     >
                         Write a Rule
@@ -74,7 +74,7 @@ export default function SiteHeader({
                     Tonight
                 </Link>
                 <Link
-                    href="/write"
+                    href={isAuthenticated ? "/write" : "/#join-wall"}
                     aria-current={currentPage === "write" ? "page" : undefined}
                 >
                     <span aria-hidden="true">+</span>

@@ -3,7 +3,6 @@ import Link from "next/link";
 import type { CSSProperties } from "react";
 
 import CaptionCard from "@/app/components/CaptionCard";
-import EvidenceNote from "@/app/components/EvidenceNote";
 import GoogleSignInButton from "@/app/components/GoogleSignInButton";
 import ScrollReveal from "@/app/components/ScrollReveal";
 import SiteFooter from "@/app/components/SiteFooter";
@@ -120,7 +119,7 @@ export default async function Home({ searchParams }: HomePageProps) {
                             </p>
                             <div className="poster-actions" aria-label="Tonight's incident actions">
                                 <Link href="#tonights-wall">Read warnings</Link>
-                                <Link href="/write">Write a rule</Link>
+                                <Link href={user ? "/write" : "#join-wall"}>Write a rule</Link>
                             </div>
                             <span className="poster-tear poster-tear-one" aria-hidden="true" />
                             <span className="poster-tear poster-tear-two" aria-hidden="true" />
@@ -148,17 +147,11 @@ export default async function Home({ searchParams }: HomePageProps) {
                                 <span>{visual.routeLabel}</span>
                                 <span>{challenge.time}</span>
                             </figcaption>
-                            <EvidenceNote
-                                detail={visual.folioDetail}
-                                hiddenNote={visual.hiddenNote}
-                                title={visual.folioTitle}
-                                variant={visual.folioVariant}
-                            />
                         </figure>
                     </section>
 
                     {!user && (
-                        <aside className="wall-sign-in-note" aria-label="Sign in to take part">
+                        <aside className="wall-sign-in-note" id="join-wall" aria-label="Sign in to take part">
                             <div>
                                 <span>Join tonight&apos;s wall</span>
                                 <p>Sign in to post a warning or vote.</p>
@@ -184,7 +177,7 @@ export default async function Home({ searchParams }: HomePageProps) {
                         ) : !captions?.length ? (
                             <div className="addenda-empty">
                                 <p>No warnings have been posted.</p>
-                                <Link href="/write">Be the first to write a rule</Link>
+                                <Link href={user ? "/write" : "#join-wall"}>Be the first to write a rule</Link>
                             </div>
                         ) : (
                             <div className="rule-grid">
