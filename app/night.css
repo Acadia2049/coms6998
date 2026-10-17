@@ -2827,7 +2827,15 @@ body { background: var(--paper); color: var(--ink); }
   transform: rotate(2.15deg);
 }
 
-.profile-photo-wrap::before { position: absolute; z-index: -1; inset: 24px -14px -13px 20px; background: var(--wall-pink); content: ""; transform: rotate(-1.5deg); }
+.profile-photo-wrap::before {
+  position: absolute;
+  z-index: -1;
+  inset: 24px -14px -13px 20px;
+  background: var(--wall-pink);
+  clip-path: polygon(calc(100% - 14px) 0, 100% 0, 100% 100%, 0 100%, 0 calc(100% - 13px), calc(100% - 14px) calc(100% - 13px));
+  content: "";
+  transform: rotate(-1.5deg);
+}
 .profile-photo-wrap::after { position: absolute; top: -10px; left: 37%; width: 86px; height: 21px; background: rgba(207, 195, 157, .82); content: ""; transform: rotate(-4deg); }
 .profile-wall-site .profile-photo-section { max-width: none; margin: 0; padding: 0; border: 0; background: transparent; }
 .profile-wall-site .profile-avatar { width: 100%; height: auto; aspect-ratio: 1 / 1; margin: 0; border: 0; border-radius: 0; background: #171918; object-fit: cover; filter: saturate(.78) contrast(1.05); }
@@ -2970,7 +2978,7 @@ body { background: var(--paper); color: var(--ink); }
 /* ---------- Final wall, writing desk, and profile refinements ---------- */
 
 .living-wall-site .wall-photo {
-  padding-bottom: 38px;
+  padding-bottom: 18px;
 }
 
 .living-wall-site .wall-photo figcaption {
@@ -3005,9 +3013,10 @@ body { background: var(--paper); color: var(--ink); }
 .living-wall-site .wall-photo::before {
   top: 34px;
   right: -18px;
-  bottom: 8px;
-  left: auto;
-  width: 20px;
+  bottom: -15px;
+  left: 24px;
+  width: auto;
+  clip-path: polygon(calc(100% - 18px) 0, 100% 0, 100% 100%, 0 100%, 0 calc(100% - 15px), calc(100% - 18px) calc(100% - 15px));
 }
 
 .living-wall-site .rule-notice:first-child .rule-notice-header > span:first-child {
@@ -3135,16 +3144,21 @@ body { background: var(--paper); color: var(--ink); }
 
 .profile-wall-site .profile-photo-button {
   border-color: #171918;
-  background: #171918;
-  box-shadow: 4px 4px 0 var(--wall-pink);
-  color: #f4efe5;
+  background: #eee8da;
+  box-shadow: 4px 4px 0 rgba(23, 25, 24, .28);
+  color: #171918;
   transition: background 140ms ease, color 140ms ease, box-shadow 140ms ease, transform 140ms ease;
 }
 
 .profile-wall-site .profile-photo-button:hover {
-  background: var(--wall-pink);
+  background: #fffaf0;
   box-shadow: 4px 4px 0 #171918;
   color: #171918;
+}
+
+.profile-wall-site .profile-photo-button:focus-visible {
+  outline: 3px solid var(--wall-pink-deep);
+  outline-offset: 3px;
 }
 
 .profile-wall-site .profile-photo-feedback {
@@ -3158,8 +3172,14 @@ body { background: var(--paper); color: var(--ink); }
 }
 
 @media (max-width: 680px) {
-  .living-wall-site .wall-photo { padding-bottom: 32px; }
-  .living-wall-site .wall-photo::before { right: -10px; bottom: 7px; width: 13px; }
+  .living-wall-site .wall-photo { padding-bottom: 16px; }
+  .living-wall-site .wall-photo::before {
+    right: -10px;
+    bottom: -11px;
+    left: 16px;
+    width: auto;
+    clip-path: polygon(calc(100% - 10px) 0, 100% 0, 100% 100%, 0 100%, 0 calc(100% - 11px), calc(100% - 10px) calc(100% - 11px));
+  }
   .living-wall-site .wall-photo figcaption { gap: 8px; }
   .living-wall-site .wall-photo figcaption span:first-child { font-size: 9px; }
   .living-wall-site .wall-photo figcaption span:last-child { font-size: 9px; }

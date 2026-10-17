@@ -25,7 +25,6 @@ export default function ProfilePhotoUpload({
 
     const [photoUrl, setPhotoUrl] = useState(initialPhotoUrl ?? "");
     const [errorMessage, setErrorMessage] = useState("");
-    const [successMessage, setSuccessMessage] = useState("");
     const [isUploading, setIsUploading] = useState(false);
 
     async function handleFileChange(
@@ -43,19 +42,16 @@ export default function ProfilePhotoUpload({
 
         if (!file.type.startsWith("image/")) {
             setErrorMessage("Please choose an image file.");
-            setSuccessMessage("");
             return;
         }
 
         if (file.size > MAX_FILE_SIZE_BYTES) {
             setErrorMessage("Image must be smaller than 5 MB.");
-            setSuccessMessage("");
             return;
         }
 
         setIsUploading(true);
         setErrorMessage("");
-        setSuccessMessage("");
 
         const supabase = createClient();
 
@@ -105,7 +101,6 @@ export default function ProfilePhotoUpload({
         }
 
         setPhotoUrl(newPhotoUrl);
-        setSuccessMessage("Profile photo updated.");
         setIsUploading(false);
 
         router.refresh();
@@ -149,9 +144,6 @@ export default function ProfilePhotoUpload({
                     <p className="profile-error">{errorMessage}</p>
                 )}
 
-                {successMessage && (
-                    <p className="profile-success">{successMessage}</p>
-                )}
             </div>
         </section>
     );
