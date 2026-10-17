@@ -91,9 +91,6 @@ export default async function WritePage() {
                     </section>
 
                     <section className="found-writing-workspace" aria-label="Warning entry form">
-                        <p className="warning-form-note">
-                            Private until published. You approve the final wording before it joins the wall.
-                        </p>
                         <SubmissionComposer
                             initialDraft={initialDraft}
                             isAuthenticated
