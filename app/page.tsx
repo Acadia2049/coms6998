@@ -19,7 +19,9 @@ export default async function Home() {
         console.error("Authentication check failed:", authError.message);
     }
 
-    if (!user) {
+    // Fail closed: never query protected data unless Supabase has positively
+    // verified the current user.
+    if (authError || !user) {
         return (
             <main className="page-container">
                 <header className="page-header">
