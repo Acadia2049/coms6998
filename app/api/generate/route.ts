@@ -19,7 +19,12 @@ const OPENAI_TIMEOUT_MS = 6_000;
 const OPENAI_SERVICE_TIER = process.env.OPENAI_SERVICE_TIER ?? "fast";
 
 type OpenAIResponsePayload = {
+    id?: string;
     error?: { message?: string };
+    usage?: {
+        input_tokens?: number;
+        output_tokens?: number;
+    };
     output?: Array<{
         content?: Array<{
             type?: string;
@@ -69,7 +74,13 @@ async function generateWithOpenAI(apiKey: string, prompt: string) {
         const generatedText = extractOpenAIText(payload);
 
         if (generatedText) {
-            return generatedText;
+            return {
+                text: generatedText,
+                providerRequestId: payload.id ?? null,
+                inputTokens: payload.usage?.input_tokens ?? null,
+                outputTokens: payload.usage?.output_tokens ?? null,
+                durationMs: Date.now() - startedAt,
+            };
         }
 
         throw new Error(`${OPENAI_MODEL} returned an empty response.`);
@@ -174,7 +185,8 @@ export async function POST(request: Request) {
     }
 
     try {
-        const generatedText = await generateWithOpenAI(apiKey, prompt);
+        const generation = await generateWithOpenAI(apiKey, prompt);
+        const generatedText = generation.text;
         const responseWordCount = countEnglishWords(generatedText);
 
         if (
@@ -228,6 +240,29 @@ export async function POST(request: Request) {
                 { error: "This draft is no longer available." },
                 { status: 409 }
             );
+        }
+
+        const { error: observabilityError } = await supabase.rpc(
+            "record_generation_observability",
+            {
+                p_caption_id: submission.id,
+                p_input_text: seed,
+                p_output_text: generatedText,
+                p_system_prompt: RULE_GENERATION_SYSTEM_INSTRUCTION,
+                p_user_prompt: prompt,
+                p_provider_request_id: generation.providerRequestId,
+                p_duration_ms: generation.durationMs,
+                p_input_tokens: generation.inputTokens,
+                p_output_tokens: generation.outputTokens,
+                p_source: "user_app",
+            }
+        );
+
+        // Observability must never make a successful user generation fail.
+        // This also keeps deployments compatible while the additive Week 7
+        // migration is being rolled out.
+        if (observabilityError) {
+            console.warn("Generation observability write failed:", observabilityError.message);
         }
 
         return NextResponse.json({ submission, seed });
