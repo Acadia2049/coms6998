@@ -1,0 +1,23 @@
+{
+  "sourceRepository": "Acadia2049/nyc-after-dark-prompt-chain-studio",
+  "sourceCommit": "093ca24bf0ec5dcb36115fc05f4a37a24f533e3b",
+  "compiler": "TypeScript 5.9.3",
+  "transformation": "transpileModule with target ES2022 and module ES2022; replace @/lib/runner/config and @/lib/runner/templates runtime imports with relative .mjs imports; no logic changes",
+  "files": [
+    {
+      "source": "lib/runner/engine.ts",
+      "sha256": "f5f22935a043e58c4653329e3850a8816250d6b65d393b2a4673e4fed0fab29f",
+      "output": "engine.mjs"
+    },
+    {
+      "source": "lib/runner/templates.ts",
+      "sha256": "c65082654ab95a83ec4bd6001d6837815eff4ca45ea26b4d6a267239113940b5",
+      "output": "templates.mjs"
+    },
+    {
+      "source": "lib/runner/config.ts",
+      "sha256": "63c2406bc995d0178632bd9f29572cd11e4cb07b6f9863466b9b14eb977c8913",
+      "output": "config.mjs"
+    }
+  ]
+}

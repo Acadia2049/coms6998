@@ -67,8 +67,10 @@ New wall queries must match both `challenge_date` and the stable scene ID in
 Run before deploying:
 
 ```bash
+npm test
+npm run test:demo
 npm run lint
-npx tsc --noEmit
+npm run typecheck
 npm run build -- --webpack
 ```
 
