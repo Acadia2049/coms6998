@@ -1,0 +1,97 @@
+{
+  "synthetic": true,
+  "note": "Real extracted runner; mocked model and in-memory journal. Timings are illustrative. No participant data or API calls.",
+  "executionSnapshot": {
+    "schema_version": 1,
+    "captured_at": "2026-11-20T12:00:00.000Z",
+    "chain": {
+      "id": 1,
+      "name": "Fictional warning revision",
+      "slug": "synthetic-demo",
+      "description": null
+    },
+    "steps": [
+      {
+        "id": 1,
+        "position": 1,
+        "name": "Draft",
+        "user_prompt_template": "Draft a fictional warning from: {{input}}",
+        "llm_model_id": 1,
+        "model_name": "Fixed mock responses",
+        "provider_model_id": "mock-no-network",
+        "is_temperature_supported": false,
+        "system_prompt": "This is fictional creative writing, not real safety advice.",
+        "temperature": null
+      },
+      {
+        "id": 2,
+        "position": 2,
+        "name": "Review",
+        "user_prompt_template": "Review this warning for clarity: {{previous_output}}",
+        "llm_model_id": 1,
+        "model_name": "Fixed mock responses",
+        "provider_model_id": "mock-no-network",
+        "is_temperature_supported": false,
+        "system_prompt": "This is fictional creative writing, not real safety advice.",
+        "temperature": null
+      },
+      {
+        "id": 3,
+        "position": 3,
+        "name": "Revise",
+        "user_prompt_template": "Original idea: {{initial_input}}\nReview: {{input}}\nWrite the revised warning.",
+        "llm_model_id": 1,
+        "model_name": "Fixed mock responses",
+        "provider_model_id": "mock-no-network",
+        "is_temperature_supported": false,
+        "system_prompt": "This is fictional creative writing, not real safety advice.",
+        "temperature": null
+      }
+    ]
+  },
+  "modelCalls": 2,
+  "result": {
+    "runId": "synthetic-failed-run",
+    "chainId": 1,
+    "chainName": "Fictional warning revision",
+    "status": "failed",
+    "initialInput": "The departure board announces a train arriving yesterday.",
+    "finalOutput": "If the departure board displays yesterday, wait beneath the clock until your train returns to today.",
+    "durationMs": 175,
+    "steps": [
+      {
+        "sequence": 1,
+        "stepId": 1,
+        "stepName": "Draft",
+        "modelId": 1,
+        "model": "mock-no-network",
+        "systemPrompt": "This is fictional creative writing, not real safety advice.",
+        "userPrompt": "Draft a fictional warning from: The departure board announces a train arriving yesterday.",
+        "output": "If the departure board displays yesterday, wait beneath the clock until your train returns to today.",
+        "status": "completed",
+        "providerRequestId": null,
+        "inputTokens": null,
+        "outputTokens": null,
+        "durationMs": 50,
+        "error": null
+      },
+      {
+        "sequence": 2,
+        "stepId": 2,
+        "stepName": "Review",
+        "modelId": 1,
+        "model": "mock-no-network",
+        "systemPrompt": "This is fictional creative writing, not real safety advice.",
+        "userPrompt": "Review this warning for clarity: If the departure board displays yesterday, wait beneath the clock until your train returns to today.",
+        "output": null,
+        "status": "failed",
+        "providerRequestId": null,
+        "inputTokens": null,
+        "outputTokens": null,
+        "durationMs": 50,
+        "error": "Simulated provider timeout"
+      }
+    ],
+    "error": "Simulated provider timeout"
+  }
+}
